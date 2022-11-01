@@ -55,7 +55,7 @@ std::vector<std::string> readTags(std::vector<char>::iterator begin, std::vector
     return tags;
 }
 
-int main() {
+void parseCiff(){
     std::vector<char> bytes = readCiff("D:\\msc2\\SzgBizt\\1.caff");
 
     std::string ciff = "CIFF";
@@ -101,6 +101,10 @@ int main() {
     }
     std::cout << std::endl;
     bytes.erase(bytes.begin(),bytes.begin() + headerLengthRemain);
+}
+
+int main() {
+    parseCiff();
 
     return 0;
 }
