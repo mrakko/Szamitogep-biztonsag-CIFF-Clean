@@ -2,8 +2,9 @@
 #include <fstream>
 #include <vector>
 #include <cmath>
+#include "ciff.h"
 
-std::vector<char> readCiff(std::string fileName){
+std::vector<char> readCiff(const std::string& fileName){
     std::ifstream input(fileName, std::ios::binary);
 
     std::vector<char> bytes(
@@ -12,7 +13,7 @@ std::vector<char> readCiff(std::string fileName){
     input.close();
 
     //TODO
-    bytes.erase(bytes.begin(), bytes.begin()+81);
+    bytes.erase(bytes.begin(), bytes.begin()+83);
 
     return bytes;
 }
@@ -20,17 +21,16 @@ std::vector<char> readCiff(std::string fileName){
 unsigned int readNumber(std::vector<char>::iterator begin, std::vector<char>::iterator end) {
     int result = 0;
     unsigned int j = 0;
-    for(auto i = begin; i != end; i++){
+    for(auto i = begin; i != end; i++, j++){
         unsigned int byte = (unsigned char)*i;
         result += byte * pow(16, 2*j);
-        j++;
     }
 
     return result;
 }
 
 std::string readUntilNewLine(std::vector<char>::iterator iterator) {
-    std::string caption = "";
+    std::string caption;
     while(*iterator != '\n'){
         caption += *iterator;
         iterator++;
@@ -41,7 +41,7 @@ std::string readUntilNewLine(std::vector<char>::iterator iterator) {
 std::vector<std::string> readTags(std::vector<char>::iterator begin, std::vector<char>::iterator end) {
     std::vector<std::string> tags;
 
-    std::string tag = "";
+    std::string tag;
     while(begin != end){
         if(*begin == '\0'){
             tags.push_back(tag);
@@ -51,16 +51,31 @@ std::vector<std::string> readTags(std::vector<char>::iterator begin, std::vector
         }
         begin++;
     }
-    tags.push_back(tag);
     return tags;
 }
 
-void parseCiff(){
-    std::vector<char> bytes = readCiff("D:\\msc2\\SzgBizt\\1.caff");
+std::vector<Ciff::Pixel> readPixels(std::vector<char>::iterator begin, std::vector<char>::iterator end) {
+    std::vector<Ciff::Pixel>pixels = std::vector<Ciff::Pixel>();
+    while(begin != end){
+        unsigned int red = (unsigned char)*begin;
+        begin++;
+        unsigned int green = (unsigned char)*begin;
+        begin++;
+        unsigned int blue = (unsigned char)*begin;
+        begin++;
 
-    std::string ciff = "CIFF";
+        pixels.push_back(Ciff::Pixel{red, green, blue});
+    }
+
+    return pixels;
+}
+
+Ciff parseCiff(std::vector<char>& bytes){
+
+
+    std::string ciffConstant = "CIFF";
     for(int i = 0; i < 4; i++){
-        if(ciff[i] != bytes[i]){
+        if(ciffConstant[i] != bytes[i]){
             throw std::invalid_argument("No CIFF magic");
         }
     }
@@ -68,19 +83,19 @@ void parseCiff(){
     bytes.erase(bytes.begin(), bytes.begin() + 4);
 
 
-    int headerSize = readNumber(bytes.begin(), bytes.begin() + 8);
+    unsigned int headerSize = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
     std::cout << "header_size: " << headerSize << std::endl;
 
-    int contentSize = readNumber(bytes.begin(), bytes.begin() + 8);
+    unsigned int contentSize = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
     std::cout << "content_size: " << contentSize << std::endl;
 
-    int width = readNumber(bytes.begin(), bytes.begin() + 8);
+    unsigned int width = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
     std::cout << "width: "  << width << std::endl;
 
-    int height = readNumber(bytes.begin(), bytes.begin() + 8);
+    unsigned int height = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
     std::cout << "height: "  << height << std::endl;
 
@@ -88,23 +103,34 @@ void parseCiff(){
         throw std::invalid_argument("content_size invalid");
     }
 
-
     std::string caption = readUntilNewLine(bytes.begin());
     bytes.erase(bytes.begin(), bytes.begin() + caption.length() + 1);
     std::cout << "caption: "  << caption << std::endl;
 
-    int headerLengthRemain = headerSize - (36 + caption.length() + 1);
+    unsigned int headerLengthRemain = headerSize - (36 + caption.length() + 1);
     std::vector<std::string> tags = readTags(bytes.begin(), bytes.begin() + headerLengthRemain);
     std::cout << "tags: ";
-    for(auto tag : tags){
+    for(const auto& tag : tags){
         std::cout << tag << " ";
     }
     std::cout << std::endl;
     bytes.erase(bytes.begin(),bytes.begin() + headerLengthRemain);
+
+    std::vector<Ciff::Pixel> pixels = readPixels(bytes.begin(), bytes.begin() + contentSize);
+    bytes.erase(bytes.begin(),bytes.begin() + contentSize);
+    std::cout << pixels.size() << std::endl;
+
+    Ciff ciff = Ciff(width, height, caption, tags);
+    ciff.setPixels(pixels);
+
+    return ciff;
 }
 
 int main() {
-    parseCiff();
+    std::vector<char> bytes = readCiff("D:\\msc2\\SzgBizt\\2.caff");
+    Ciff ciff = parseCiff(bytes);
+    bytes.erase(bytes.begin(),bytes.begin() + 17);
+    Ciff ciff2 = parseCiff(bytes);
 
     return 0;
 }
