@@ -41,6 +41,15 @@ unsigned int readNumber(std::vector<char>::iterator begin, std::vector<char>::it
     return result;
 }
 
+std::string readText(std::vector<char>::iterator begin, std::vector<char>::iterator end) {
+    std::string result;
+    for(auto i = begin; i != end; i++){
+        result += *i;
+    }
+
+    return result;
+}
+
 std::string readUntilNewLine(std::vector<char>::iterator iterator) {
     std::string caption;
     while(*iterator != '\n'){
@@ -141,7 +150,9 @@ Ciff parseCiff(std::vector<char>& bytes){
 void createPng(const Ciff& ciff){
     int width = ciff.getWidth();
     int height = ciff.getHeight();
+    std::cout << "asd";
     uint8_t image[ width * height * 4 ];
+    std::cout << "asd";
 
     const char* filename = "data/ciff2.png";
 
@@ -169,7 +180,7 @@ void createPng(const Ciff& ciff){
     GifEnd(&writer);
 }
 
-void readCaffHeader(std::vector<char>& bytes){
+void readCaffHeader(std::vector<char>& bytes, Caff& caff){
     unsigned int id = unsigned(bytes[0]);
     bytes.erase(bytes.begin(), bytes.begin() + 1);
     if(id != 1){
@@ -182,9 +193,9 @@ void readCaffHeader(std::vector<char>& bytes){
         throw std::invalid_argument("CAFF header should be 20 bytes long but it was:" + std::to_string(blockLength));
     }
 
-    std::string caff = "CAFF";
+    std::string caffStr = "CAFF";
     for(int i = 0; i < 4; i++){
-        if(caff[i] != bytes[i]){
+        if(caffStr[i] != bytes[i]){
             throw std::invalid_argument("No CAFF magic");
         }
     }
@@ -192,58 +203,81 @@ void readCaffHeader(std::vector<char>& bytes){
 
     unsigned int headerSize = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
-    std::cout << "header_size: " << headerSize << std::endl;
 
     unsigned int numAnim = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
-    std::cout << "num_anim: " << numAnim << std::endl;
+    caff.numAnim = numAnim;
 }
 
-void readCreditsBlock(std::vector<char>& bytes){
-    std::cout << "read credits block" << std::endl;
+void readCreditsBlock(std::vector<char>& bytes, Caff& caff){
+    std::cout << "--- read credits block" << std::endl;
+
+    // TODO needed somewhere?
+    // unsigned int blockLength = readNumber(bytes.begin(), bytes.begin() + 8);
+    bytes.erase(bytes.begin(), bytes.begin() + 8);
 
     unsigned int year = readNumber(bytes.begin(), bytes.begin() + 2);
     bytes.erase(bytes.begin(), bytes.begin() + 2);
-    std::cout << "year:" << year << std::endl;
+    caff.year = year;
 
     unsigned int month = readNumber(bytes.begin(), bytes.begin() + 1);
     bytes.erase(bytes.begin(), bytes.begin() + 1);
-    std::cout << "month:" << month << std::endl;
+    caff.month = month;
 
     unsigned int day = readNumber(bytes.begin(), bytes.begin() + 1);
     bytes.erase(bytes.begin(), bytes.begin() + 1);
-    std::cout << "day:" << day << std::endl;
+    caff.day = day;
 
     unsigned int hour = readNumber(bytes.begin(), bytes.begin() + 1);
     bytes.erase(bytes.begin(), bytes.begin() + 1);
-    std::cout << "hour:" << hour << std::endl;
+    caff.hour = hour;
 
     unsigned int minute = readNumber(bytes.begin(), bytes.begin() + 1);
     bytes.erase(bytes.begin(), bytes.begin() + 1);
-    std::cout << "minute:" << minute << std::endl;
+    caff.minute = minute;
 
     unsigned int creatorLen = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
-    std::cout << "creatorLen:" << creatorLen << std::endl;
+
+    if(creatorLen == 0){
+        caff.creator = "";
+        return;
+    }
+
+    std::string creator = readText(bytes.begin(), bytes.begin() + creatorLen);
+    bytes.erase(bytes.begin(), bytes.begin() + creatorLen);
+    caff.creator = creator;
 }
 
-void readAnimationsBlock(std::vector<char>& bytes){
-    std::cout << "read animations block" << std::endl;
+void readAnimationsBlock(std::vector<char>& bytes, Caff& caff){
+    std::cout << "--- read animations block" << std::endl;
+    
+    // TODO needed somewhere?
+    // unsigned int blockLength = readNumber(bytes.begin(), bytes.begin() + 8);
+    bytes.erase(bytes.begin(), bytes.begin() + 8);
 
-    unsigned int duration = readNumber(bytes.begin(), bytes.begin() + 2);
-    bytes.erase(bytes.begin(), bytes.begin() + 2);
-    std::cout << "duration:" << duration << std::endl;
+    unsigned int duration = readNumber(bytes.begin(), bytes.begin() + 8);
+    bytes.erase(bytes.begin(), bytes.begin() + 8);
 
-    // TODO read CIFF
+    Ciff ciff = parseCiff(bytes);
+
+    CiffAnimation ciffAnim = {
+        duration,
+        ciff,
+    };
+
+    caff.ciffAnimations.push_back(ciffAnim);
 }
 
-void parseCaff(){
-    std::vector<char> bytes = readCaff("data/1.caff");
+Caff parseCaff(std::string path){
+    Caff caff = Caff();
+
+    std::vector<char> bytes = readCaff(path);
     std::cout << "starting size:" << bytes.size() << std::endl;
 
-    readCaffHeader(bytes);
+    readCaffHeader(bytes, caff);
     
-    // while(???){
+    while(bytes.size() > 0){
         unsigned blockId = unsigned(bytes[0]);
         bytes.erase(bytes.begin(), bytes.begin() + 1);
 
@@ -253,28 +287,54 @@ void parseCaff(){
             throw std::invalid_argument("Another CAFF header?");
             break;
         case 2:
-            readCreditsBlock(bytes);
+            readCreditsBlock(bytes, caff);
             break;
         case 3:
-            readAnimationsBlock(bytes);
+            readAnimationsBlock(bytes, caff);
             break;
         default:
             throw std::invalid_argument("Invalid block ID:" + std::to_string(blockId));
         }
-    // }
+    }
 
+    return caff;
+}
 
+void createGif(Caff caff){
+    int width = caff.ciffAnimations[0].ciff.getWidth();
+    int height = caff.ciffAnimations[0].ciff.getHeight();
+
+	auto fileName = "data/test.gif";
+    
+    GifWriter g;
+    GifBegin(&g, fileName, width, height, 0);
+    for(CiffAnimation ca : caff.ciffAnimations){
+        std::cout << ca.duration << std::endl;
+        int delay = ca.duration / 10;
+        std::vector<Ciff::Pixel> pixels = ca.ciff.getPixels();
+        std::vector<uint8_t> container;
+        for (Ciff::Pixel pixel : pixels){
+            container.push_back(pixel.Red);
+            container.push_back(pixel.Green);
+            container.push_back(pixel.Blue);
+            container.push_back(255);
+        }
+
+        GifWriteFrame(&g, container.data(), width, height, delay);
+    }
+	GifEnd(&g);
 }
 
 int main() {
-    // parseCaff();
+    Caff caff = parseCaff("data/2.caff");
+    createGif(caff);
 
-    std::vector<char> bytes = readCiff("data/2.caff");
-    Ciff ciff = parseCiff(bytes);
-    bytes.erase(bytes.begin(), bytes.begin() + 17);
-    Ciff ciff2 = parseCiff(bytes);
+    // std::vector<char> bytes = readCiff("data/2.caff");
+    // Ciff ciff = parseCiff(bytes);
+    // bytes.erase(bytes.begin(), bytes.begin() + 17);
+    // Ciff ciff2 = parseCiff(bytes);
 
-    createPng(ciff);
+    // createPng(ciff);
 
     return 0;
 }

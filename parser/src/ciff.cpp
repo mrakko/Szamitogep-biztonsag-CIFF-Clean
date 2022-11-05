@@ -4,6 +4,7 @@
 
 #include "ciff.h"
 #include <iostream>
+#include <vector>
 
 Ciff::Ciff(unsigned int w, unsigned int h, std::string &c, std::vector<std::string> &t)
         : width(w), height(h), caption(c), tags(t) {}
@@ -27,3 +28,6 @@ Ciff::Pixel Ciff::getPixel(int x, int y) const {
     return this->pixels.at(y * height + x);
 }
 
+std::vector<Ciff::Pixel> Ciff::getPixels() const {
+    return this->pixels;
+}

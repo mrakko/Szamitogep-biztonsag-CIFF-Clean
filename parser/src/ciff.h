@@ -21,6 +21,7 @@ public:
     int getWidth() const;
     int getHeight() const;
     Pixel getPixel(int x, int y) const;
+    std::vector<Pixel> getPixels() const;
 private:
     int width;
     int height;
@@ -29,5 +30,20 @@ private:
     std::vector<Pixel> pixels;
 };
 
+struct CiffAnimation{
+    unsigned int duration;
+    Ciff ciff;
+};
+
+struct Caff{
+    unsigned int numAnim;
+    unsigned int year;
+    unsigned int month;
+    unsigned int day;
+    unsigned int hour;
+    unsigned int minute;
+    std::string creator;
+    std::vector<CiffAnimation> ciffAnimations;
+};
 
 #endif //CIFF_CLEAN_CIFF_H
