@@ -4,25 +4,25 @@
 #include <cmath>
 #include "ciff.h"
 #include "gif.h"
+#include <deque>
 
-std::vector<char> readCiff(const std::string& fileName){
+std::deque<char> readCiff(const std::string& fileName){
     std::ifstream input(fileName, std::ios::binary);
 
-    std::vector<char> bytes(
+    std::deque<char> bytes(
             (std::istreambuf_iterator<char>(input)),
             (std::istreambuf_iterator<char>()));
     input.close();
 
-    //TODO
     bytes.erase(bytes.begin(), bytes.begin()+83);
 
     return bytes;
 }
 
-std::vector<char> readCaff(std::string fileName){
+std::deque<char> readCaff(std::string fileName){
     std::ifstream input(fileName, std::ios::binary);
 
-    std::vector<char> bytes(
+    std::deque<char> bytes(
             (std::istreambuf_iterator<char>(input)),
             (std::istreambuf_iterator<char>()));
     input.close();
@@ -30,7 +30,7 @@ std::vector<char> readCaff(std::string fileName){
     return bytes;
 }
 
-unsigned int readNumber(std::vector<char>::iterator begin, std::vector<char>::iterator end) {
+unsigned int readNumber(std::deque<char>::iterator begin, std::deque<char>::iterator end) {
     int result = 0;
     unsigned int j = 0;
     for(auto i = begin; i != end; i++, j++){
@@ -41,7 +41,7 @@ unsigned int readNumber(std::vector<char>::iterator begin, std::vector<char>::it
     return result;
 }
 
-std::string readText(std::vector<char>::iterator begin, std::vector<char>::iterator end) {
+std::string readText(std::deque<char>::iterator begin, std::deque<char>::iterator end) {
     std::string result;
     for(auto i = begin; i != end; i++){
         result += *i;
@@ -50,7 +50,7 @@ std::string readText(std::vector<char>::iterator begin, std::vector<char>::itera
     return result;
 }
 
-std::string readUntilNewLine(std::vector<char>::iterator iterator) {
+std::string readUntilNewLine(std::deque<char>::iterator iterator) {
     std::string caption;
     while(*iterator != '\n'){
         caption += *iterator;
@@ -59,7 +59,7 @@ std::string readUntilNewLine(std::vector<char>::iterator iterator) {
     return caption;
 }
 
-std::vector<std::string> readTags(std::vector<char>::iterator begin, std::vector<char>::iterator end) {
+std::vector<std::string> readTags(std::deque<char>::iterator begin, std::deque<char>::iterator end) {
     std::vector<std::string> tags;
 
     std::string tag;
@@ -75,8 +75,8 @@ std::vector<std::string> readTags(std::vector<char>::iterator begin, std::vector
     return tags;
 }
 
-std::vector<Ciff::Pixel> readPixels(std::vector<char>::iterator begin, std::vector<char>::iterator end) {
-    std::vector<Ciff::Pixel>pixels = std::vector<Ciff::Pixel>();
+std::vector<Pixel> readPixels(std::deque<char>::iterator begin, std::deque<char>::iterator end) {
+    std::vector<Pixel>pixels = std::vector<Pixel>();
     while(begin != end){
         unsigned int red = (unsigned char)*begin;
         begin++;
@@ -85,15 +85,13 @@ std::vector<Ciff::Pixel> readPixels(std::vector<char>::iterator begin, std::vect
         unsigned int blue = (unsigned char)*begin;
         begin++;
 
-        pixels.push_back(Ciff::Pixel{red, green, blue});
+        pixels.push_back(Pixel{red, green, blue});
     }
 
     return pixels;
 }
 
-Ciff parseCiff(std::vector<char>& bytes){
-
-
+Ciff parseCiff(std::deque<char>& bytes){
     std::string ciffConstant = "CIFF";
     for(int i = 0; i < 4; i++){
         if(ciffConstant[i] != bytes[i]){
@@ -101,23 +99,31 @@ Ciff parseCiff(std::vector<char>& bytes){
         }
     }
 
-    bytes.erase(bytes.begin(), bytes.begin() + 4);
+    size_t deletedBytes = 0;
 
+    bytes.erase(bytes.begin(), bytes.begin() + 4);
+    deletedBytes += 4;
 
     unsigned int headerSize = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
+    deletedBytes += 8;
     std::cout << "header_size: " << headerSize << std::endl;
 
     unsigned int contentSize = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
+    deletedBytes += 8;
     std::cout << "content_size: " << contentSize << std::endl;
 
     unsigned int width = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
+    deletedBytes += 8;
+
     std::cout << "width: "  << width << std::endl;
 
     unsigned int height = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
+    deletedBytes += 8;
+
     std::cout << "height: "  << height << std::endl;
 
     if(contentSize != width * height * 3){
@@ -126,9 +132,10 @@ Ciff parseCiff(std::vector<char>& bytes){
 
     std::string caption = readUntilNewLine(bytes.begin());
     bytes.erase(bytes.begin(), bytes.begin() + caption.length() + 1);
+    deletedBytes += caption.length() + 1;
     std::cout << "caption: "  << caption << std::endl;
 
-    unsigned int headerLengthRemain = headerSize - (36 + caption.length() + 1);
+    unsigned int headerLengthRemain = headerSize - deletedBytes;
     std::vector<std::string> tags = readTags(bytes.begin(), bytes.begin() + headerLengthRemain);
     std::cout << "tags: ";
     for(const auto& tag : tags){
@@ -137,50 +144,40 @@ Ciff parseCiff(std::vector<char>& bytes){
     std::cout << std::endl;
     bytes.erase(bytes.begin(),bytes.begin() + headerLengthRemain);
 
-    std::vector<Ciff::Pixel> pixels = readPixels(bytes.begin(), bytes.begin() + contentSize);
+    std::vector<Pixel> pixels = readPixels(bytes.begin(), bytes.begin() + contentSize);
     bytes.erase(bytes.begin(),bytes.begin() + contentSize);
     std::cout << pixels.size() << std::endl;
 
-    Ciff ciff = Ciff(width, height, caption, tags);
-    ciff.setPixels(pixels);
+    Ciff ciff = Ciff{width =  width, height = height, caption = caption, tags = tags, pixels = pixels};
 
     return ciff;
 }
 
 void createPng(const Ciff& ciff){
-    int width = ciff.getWidth();
-    int height = ciff.getHeight();
-    std::cout << "asd";
-    uint8_t image[ width * height * 4 ];
-    std::cout << "asd";
+    int width = ciff.width;
+    int height = ciff.height;
+
+    std::vector<uint8_t> image;
 
     const char* filename = "data/ciff2.png";
 
     GifWriter writer = {};
-    GifBegin(&writer, filename, width, height, 2);
+    GifBegin(&writer, filename, width, height, 0);
 
-    for(int y=0; y<height; y++)
-    {
-        for(int x=0; x<width; x++)
-        {
-            auto pixel = ciff.getPixel(x, y);
-            auto red = (uint8_t)pixel.Red;
-            auto green = (uint8_t)pixel.Green;
-            auto blue = (uint8_t)pixel.Blue;
-
-            image[(y*width+x)*4] = red;
-            image[(y*width+x)*4 + 1] = green;
-            image[(y*width+x)*4 + 2] = blue;
-            //image[(y*width+x)*4 + 3] = 255;
-        }
+    for (Pixel pixel : ciff.pixels){
+        image.push_back(pixel.Red);
+        image.push_back(pixel.Green);
+        image.push_back(pixel.Blue);
+        image.push_back(255);
     }
 
-    GifWriteFrame(&writer, image, width, height, 2);
+    GifWriteFrame(&writer, image.data(), width, height, 0);
 
     GifEnd(&writer);
 }
 
-void readCaffHeader(std::vector<char>& bytes, Caff& caff){
+
+void readCaffHeader(std::deque<char>& bytes, Caff& caff){
     unsigned int id = unsigned(bytes[0]);
     bytes.erase(bytes.begin(), bytes.begin() + 1);
     if(id != 1){
@@ -209,7 +206,7 @@ void readCaffHeader(std::vector<char>& bytes, Caff& caff){
     caff.numAnim = numAnim;
 }
 
-void readCreditsBlock(std::vector<char>& bytes, Caff& caff){
+void readCreditsBlock(std::deque<char>& bytes, Caff& caff){
     std::cout << "--- read credits block" << std::endl;
 
     // TODO needed somewhere?
@@ -249,7 +246,7 @@ void readCreditsBlock(std::vector<char>& bytes, Caff& caff){
     caff.creator = creator;
 }
 
-void readAnimationsBlock(std::vector<char>& bytes, Caff& caff){
+void readAnimationsBlock(std::deque<char>& bytes, Caff& caff){
     std::cout << "--- read animations block" << std::endl;
     
     // TODO needed somewhere?
@@ -272,7 +269,7 @@ void readAnimationsBlock(std::vector<char>& bytes, Caff& caff){
 Caff parseCaff(std::string path){
     Caff caff = Caff();
 
-    std::vector<char> bytes = readCaff(path);
+    std::deque<char> bytes = readCaff(path);
     std::cout << "starting size:" << bytes.size() << std::endl;
 
     readCaffHeader(bytes, caff);
@@ -301,8 +298,8 @@ Caff parseCaff(std::string path){
 }
 
 void createGif(Caff caff){
-    int width = caff.ciffAnimations[0].ciff.getWidth();
-    int height = caff.ciffAnimations[0].ciff.getHeight();
+    int width = caff.ciffAnimations[0].ciff.width;
+    int height = caff.ciffAnimations[0].ciff.height;
 
 	auto fileName = "data/test.gif";
     
@@ -311,9 +308,9 @@ void createGif(Caff caff){
     for(CiffAnimation ca : caff.ciffAnimations){
         std::cout << ca.duration << std::endl;
         int delay = ca.duration / 10;
-        std::vector<Ciff::Pixel> pixels = ca.ciff.getPixels();
+        std::vector<Pixel> pixels = ca.ciff.pixels;
         std::vector<uint8_t> container;
-        for (Ciff::Pixel pixel : pixels){
+        for (Pixel pixel : pixels){
             container.push_back(pixel.Red);
             container.push_back(pixel.Green);
             container.push_back(pixel.Blue);
@@ -328,13 +325,6 @@ void createGif(Caff caff){
 int main() {
     Caff caff = parseCaff("data/2.caff");
     createGif(caff);
-
-    // std::vector<char> bytes = readCiff("data/2.caff");
-    // Ciff ciff = parseCiff(bytes);
-    // bytes.erase(bytes.begin(), bytes.begin() + 17);
-    // Ciff ciff2 = parseCiff(bytes);
-
-    // createPng(ciff);
 
     return 0;
 }

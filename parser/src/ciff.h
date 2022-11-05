@@ -8,23 +8,15 @@
 #include <string>
 #include <vector>
 
+struct Pixel {
+    unsigned int Red;
+    unsigned int Green;
+    unsigned int Blue;
+};
 
-class Ciff{
-public:
-    struct Pixel {
-        unsigned int Red;
-        unsigned int Green;
-        unsigned int Blue;
-    };
-    Ciff(unsigned int w, unsigned int h, std::string& c, std::vector<std::string>& t);
-    void setPixels(std::vector<Pixel>& p);
-    int getWidth() const;
-    int getHeight() const;
-    Pixel getPixel(int x, int y) const;
-    std::vector<Pixel> getPixels() const;
-private:
-    int width;
-    int height;
+struct Ciff{
+    unsigned int width;
+    unsigned int height;
     std::string caption;
     std::vector<std::string> tags;
     std::vector<Pixel> pixels;
