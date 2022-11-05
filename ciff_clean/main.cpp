@@ -138,7 +138,6 @@ Ciff parseCiff(std::vector<char>& bytes){
     return ciff;
 }
 
-<<<<<<< HEAD
 void createPng(const Ciff& ciff){
     int width = ciff.getWidth();
     int height = ciff.getHeight();
@@ -169,8 +168,6 @@ void createPng(const Ciff& ciff){
 
     GifEnd(&writer);
 }
-
-=======
 
 void readCaffHeader(std::vector<char>& bytes){
     unsigned int id = unsigned(bytes[0]);
@@ -228,8 +225,6 @@ void readCreditsBlock(std::vector<char>& bytes){
     unsigned int creatorLen = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
     std::cout << "creatorLen:" << creatorLen << std::endl;
-
-
 }
 
 void readAnimationsBlock(std::vector<char>& bytes){
@@ -271,8 +266,6 @@ void parseCaff(){
 
 }
 
-
->>>>>>> 9df5835e722f53116834c978d155db31701378e1
 int main() {
     std::vector<char> bytes = readCiff("../2.caff");
     Ciff ciff = parseCiff(bytes);
