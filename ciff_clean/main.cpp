@@ -3,6 +3,7 @@
 #include <vector>
 #include <cmath>
 #include "ciff.h"
+#include "gif.h"
 
 std::vector<char> readCiff(const std::string& fileName){
     std::ifstream input(fileName, std::ios::binary);
@@ -126,14 +127,49 @@ Ciff parseCiff(std::vector<char>& bytes){
     return ciff;
 }
 
+void createPng(const Ciff& ciff){
+    int width = ciff.getWidth();
+    int height = ciff.getHeight();
+    uint8_t image[ width * height * 4 ];
+
+    const char* filename = "../ciff2.png";
+
+    GifWriter writer = {};
+    GifBegin(&writer, filename, width, height, 2);
+
+    for(int y=0; y<height; y++)
+    {
+        for(int x=0; x<width; x++)
+        {
+            auto pixel = ciff.getPixel(x, y);
+            auto red = (uint8_t)pixel.Red;
+            auto green = (uint8_t)pixel.Green;
+            auto blue = (uint8_t)pixel.Blue;
+
+            image[(y*width+x)*4] = red;
+            image[(y*width+x)*4 + 1] = green;
+            image[(y*width+x)*4 + 2] = blue;
+            //image[(y*width+x)*4 + 3] = 255;
+        }
+    }
+
+    GifWriteFrame(&writer, image, width, height, 2);
+
+    GifEnd(&writer);
+}
+
 int main() {
-    std::vector<char> bytes = readCiff("D:\\msc2\\SzgBizt\\2.caff");
+    std::vector<char> bytes = readCiff("../2.caff");
     Ciff ciff = parseCiff(bytes);
     bytes.erase(bytes.begin(),bytes.begin() + 17);
     Ciff ciff2 = parseCiff(bytes);
 
+    createPng(ciff);
+
     return 0;
 }
+
+
 
 
 

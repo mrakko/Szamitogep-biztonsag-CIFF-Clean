@@ -15,3 +15,15 @@ void Ciff::setPixels(std::vector<Pixel> &p) {
     pixels = p;
 }
 
+int Ciff::getHeight() const {
+    return this->height;
+}
+
+int Ciff::getWidth() const {
+    return this->width;
+}
+
+Ciff::Pixel Ciff::getPixel(int x, int y) const {
+    return this->pixels.at(y * height + x);
+}
+

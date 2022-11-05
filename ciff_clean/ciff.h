@@ -18,7 +18,9 @@ public:
     };
     Ciff(unsigned int w, unsigned int h, std::string& c, std::vector<std::string>& t);
     void setPixels(std::vector<Pixel>& p);
-
+    int getWidth() const;
+    int getHeight() const;
+    Pixel getPixel(int x, int y) const;
 private:
     int width;
     int height;
