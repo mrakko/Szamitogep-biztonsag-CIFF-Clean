@@ -8,20 +8,6 @@
 #include "ciff.h"
 #include "gif.h"
 
-
-std::deque<char> readCiff(const std::string& fileName){
-    std::ifstream input(fileName, std::ios::binary);
-
-    std::deque<char> bytes(
-            (std::istreambuf_iterator<char>(input)),
-            (std::istreambuf_iterator<char>()));
-    input.close();
-
-    bytes.erase(bytes.begin(), bytes.begin()+83);
-
-    return bytes;
-}
-
 std::deque<char> readCaff(std::string fileName){
     std::ifstream input(fileName, std::ios::binary);
 
@@ -165,7 +151,6 @@ void createPng(const Ciff& ciff){
 
     GifEnd(&writer);
 }
-
 
 void readCaffHeader(std::deque<char>& bytes, Caff& caff){
     unsigned int id = unsigned(bytes[0]);
