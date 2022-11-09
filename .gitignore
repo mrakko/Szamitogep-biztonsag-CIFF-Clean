@@ -1,0 +1,6 @@
+.vscode
+
+parser/obj
+parser/data/*.gif
+parser/*.d
+parser/*.exe

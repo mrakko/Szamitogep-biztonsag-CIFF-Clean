@@ -1,10 +1,13 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <deque>
 #include <cmath>
+#include <filesystem>
+
 #include "ciff.h"
 #include "gif.h"
-#include <deque>
+
 
 std::deque<char> readCiff(const std::string& fileName){
     std::ifstream input(fileName, std::ios::binary);
@@ -107,24 +110,18 @@ Ciff parseCiff(std::deque<char>& bytes){
     unsigned int headerSize = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
     deletedBytes += 8;
-    std::cout << "header_size: " << headerSize << std::endl;
 
     unsigned int contentSize = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
     deletedBytes += 8;
-    std::cout << "content_size: " << contentSize << std::endl;
 
     unsigned int width = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
     deletedBytes += 8;
 
-    std::cout << "width: "  << width << std::endl;
-
     unsigned int height = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
     deletedBytes += 8;
-
-    std::cout << "height: "  << height << std::endl;
 
     if(contentSize != width * height * 3){
         throw std::invalid_argument("content_size invalid");
@@ -133,20 +130,13 @@ Ciff parseCiff(std::deque<char>& bytes){
     std::string caption = readUntilNewLine(bytes.begin());
     bytes.erase(bytes.begin(), bytes.begin() + caption.length() + 1);
     deletedBytes += caption.length() + 1;
-    std::cout << "caption: "  << caption << std::endl;
 
     unsigned int headerLengthRemain = headerSize - deletedBytes;
     std::vector<std::string> tags = readTags(bytes.begin(), bytes.begin() + headerLengthRemain);
-    std::cout << "tags: ";
-    for(const auto& tag : tags){
-        std::cout << tag << " ";
-    }
-    std::cout << std::endl;
     bytes.erase(bytes.begin(),bytes.begin() + headerLengthRemain);
 
     std::vector<Pixel> pixels = readPixels(bytes.begin(), bytes.begin() + contentSize);
     bytes.erase(bytes.begin(),bytes.begin() + contentSize);
-    std::cout << pixels.size() << std::endl;
 
     Ciff ciff = Ciff{width =  width, height = height, caption = caption, tags = tags, pixels = pixels};
 
@@ -198,7 +188,7 @@ void readCaffHeader(std::deque<char>& bytes, Caff& caff){
     }
     bytes.erase(bytes.begin(), bytes.begin() + 4);
 
-    unsigned int headerSize = readNumber(bytes.begin(), bytes.begin() + 8);
+    // unsigned int headerSize = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
 
     unsigned int numAnim = readNumber(bytes.begin(), bytes.begin() + 8);
@@ -207,9 +197,7 @@ void readCaffHeader(std::deque<char>& bytes, Caff& caff){
 }
 
 void readCreditsBlock(std::deque<char>& bytes, Caff& caff){
-    std::cout << "--- read credits block" << std::endl;
 
-    // TODO needed somewhere?
     // unsigned int blockLength = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
 
@@ -247,9 +235,7 @@ void readCreditsBlock(std::deque<char>& bytes, Caff& caff){
 }
 
 void readAnimationsBlock(std::deque<char>& bytes, Caff& caff){
-    std::cout << "--- read animations block" << std::endl;
-    
-    // TODO needed somewhere?
+
     // unsigned int blockLength = readNumber(bytes.begin(), bytes.begin() + 8);
     bytes.erase(bytes.begin(), bytes.begin() + 8);
 
@@ -270,7 +256,6 @@ Caff parseCaff(std::string path){
     Caff caff = Caff();
 
     std::deque<char> bytes = readCaff(path);
-    std::cout << "starting size:" << bytes.size() << std::endl;
 
     readCaffHeader(bytes, caff);
     
@@ -297,16 +282,13 @@ Caff parseCaff(std::string path){
     return caff;
 }
 
-void createGif(Caff caff){
+void createGif(Caff caff, std::string gifPath){
     int width = caff.ciffAnimations[0].ciff.width;
     int height = caff.ciffAnimations[0].ciff.height;
-
-	auto fileName = "data/test.gif";
     
     GifWriter g;
-    GifBegin(&g, fileName, width, height, 0);
+    GifBegin(&g, gifPath.c_str(), width, height, 0);
     for(CiffAnimation ca : caff.ciffAnimations){
-        std::cout << ca.duration << std::endl;
         int delay = ca.duration / 10;
         std::vector<Pixel> pixels = ca.ciff.pixels;
         std::vector<uint8_t> container;
@@ -322,15 +304,28 @@ void createGif(Caff caff){
 	GifEnd(&g);
 }
 
-int main() {
-    Caff caff = parseCaff("data/2.caff");
-    createGif(caff);
+int main(int argc, char** argv) {
+    if (argc != 3){
+        throw std::invalid_argument("The 2 arguments should be: caff path and gif path.");
+    }
+    std::string caffPath = argv[1];
+    std::string gifPath = argv[2];
+
+    if (!std::filesystem::exists(caffPath)){
+        throw std::invalid_argument("Caff file not found:" + caffPath);
+    }
+    std::string gifDir_bs = gifPath.substr(0, gifPath.rfind('\\'));
+    std::string gifDir_fs = gifPath.substr(0, gifPath.rfind('/'));
+    std::string gifDir = gifDir_bs;
+    if (gifDir_fs.size() < gifDir_bs.size()){
+        gifDir = gifDir_fs;
+    }
+    if (!std::filesystem::exists(gifDir)){
+        throw std::invalid_argument("Directory of gif not found:" + gifDir);
+    }
+
+    Caff caff = parseCaff(caffPath); // ex: "data/2.caff"
+    createGif(caff, gifPath); // ex: "data/test.gif"
 
     return 0;
 }
-
-
-
-
-
-
