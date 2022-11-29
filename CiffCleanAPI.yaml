@@ -1,0 +1,367 @@
+openapi: 3.0.3
+info:
+  title: Ciff Clean - OpenAPI 3.0
+  version: 0.9.0
+externalDocs:
+  description: Source code - Github
+  url: https://github.com/mrakko/Szamitogep-biztonsag-CIFF-Clean
+servers:
+  - url: https://petstore3.swagger.io/api/v3
+security:
+  - bearerAuth: []
+paths:
+  /auth/register:
+    post:
+      tags:
+        - auth
+      operationId: registerUser
+      summary: Register and login a new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDTO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokenDTO'
+  /auth/login:
+    post:
+      tags:
+        - auth
+      operationId: loginUser
+      summary: Login a user
+      requestBody:
+        description: Returns JWT token details
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginUserDTO'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserTokenDTO'
+  /auth/changePassword:
+    post:
+      tags:
+        - auth
+      operationId: changePassword
+      summary: Change password of the user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeUserPasswordDTO'
+        required: true
+      responses:
+        '200':
+          description: OK
+  /user:
+    get:
+      tags:
+        - user
+      operationId: getUser
+      summary: Get signed in user's details
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+    put:
+      tags:
+        - user
+      operationId: editUser
+      summary: Edit current user's details
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditUserDTO'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+  /media/upload:
+    post:
+      tags:
+        - media
+      operationId: uploadFile
+      summary: Upload a new file
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        '200':
+          description: Uploaded file's ID
+          content:
+            text/plain:
+              schema:
+                type: string
+  /media:
+    get:
+      tags:
+        - media
+      operationId: getFiles
+      summary: Get all available files
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MediaDTO'
+  /media/{id}/modify:
+    put:
+      tags:
+        - media
+      operationId: modifyFile
+      summary: Modify an uploaded file's name (admin only)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditFileDTO'
+        required: true
+      parameters: 
+      - name: id
+        in: path
+        required: true
+        description: ID of the media file
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaDTO'
+  /media/{id}/delete:
+    delete:
+      tags:
+        - media
+      operationId: deleteFile
+      summary: Delete an uploaded file (admin only)
+      responses:
+        '204':
+          description: No content
+      parameters: 
+      - name: id
+        in: path
+        required: true
+        description: ID of the media file
+        schema:
+          type: integer
+  /media/{id}/download:
+    get:
+      tags:
+        - media
+      operationId: downloadFile
+      summary: Download a file
+      responses:
+        '200':
+          description: ''
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+                nullable: false
+      parameters: 
+      - name: id
+        in: path
+        required: true
+        description: ID of the file
+        schema:
+          type: integer
+  /media/search:
+    get:
+      tags:
+        - media
+      operationId: searchFile
+      summary: Search files
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MediaDTO'
+      parameters: 
+        - name: query
+          in: query
+          description: Name of the file
+          required: false
+          style: form
+          schema:
+            type: string
+  /media/comment:
+    post:
+      tags:
+        - media
+      operationId: commentFile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommentDTO'
+        required: true
+      responses:
+        '201':
+          description: Created
+components:
+  schemas:
+    LoginUserDTO:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    CreateUserDTO:
+      required:
+        - email
+        - password
+        - fullName
+        - address
+      type: object
+      properties:
+        address:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        fullName:
+          type: string
+        profileImage:
+          type: string
+          format: binary
+    UserTokenDTO:
+      type: object
+      properties:
+        value:
+          type: string
+        expirationDate:
+          type: string
+          format: date-time
+        userId:
+          type: integer
+    ChangeUserPasswordDTO:
+      type: object
+      properties:
+        oldPassword:
+          type: string
+        newPassword:
+          type: string
+    CreateCommentDTO:
+      type: object
+      properties:
+        text:
+          type: string
+        fileId:
+          type: integer
+    CommentDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        text:
+          type: string
+        commenter:
+          $ref: '#/components/schemas/PublicUserDTO'
+    EditUserDTO:
+      type: object
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+        address:
+          type: string
+    UserDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+        role:  
+          $ref: '#/components/schemas/UserRole'
+        fullName:
+          type: string
+        address:
+          type: string
+        email:
+          type: string
+          format: email
+        profileImage:
+          type: string
+          format: byte
+    PublicUserDTO:
+      description: Publicly available infos of the user (used for identifying commenter)
+      type: object
+      properties:
+        id:
+          type: integer
+        role:  
+          $ref: '#/components/schemas/UserRole'
+        fullName:
+          type: string
+        profileImage:
+          type: string
+          format: byte
+    MediaDTO:
+      type: object
+      properties:
+        fileId:
+          type: integer
+        fileName:
+          type: string
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentDTO'
+    EditFileDTO:
+      type: object
+      properties:
+        fileName:
+          type: string
+        
+    UserRole:
+      type: string
+      enum:
+        - admin
+        - regular
+        
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    
