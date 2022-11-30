@@ -8,13 +8,22 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+import com.example.ciffclean.domain.GifFile;
+import com.example.ciffclean.repositories.GifFileRepository;
+
 @Component
 public class MediaService {
 
     private static final String TMP_CAFF_FOLDER_PATH = "tmp/caff";
     private static final String TMP_GIF_FOLDER_PATH = "tmp/gif";
     
-    public void addCaff(byte[] content, String name, Long userId){
+    private final GifFileRepository gifFileRepository;
+
+    public MediaService(GifFileRepository gifFileRepository) {
+        this.gifFileRepository = gifFileRepository;
+    }
+    
+    public Long addCaff(byte[] content, String name, Long userId){
         String uuid = UUID.randomUUID().toString();
         Path caff_path = Paths.get(TMP_CAFF_FOLDER_PATH + "/" + uuid + ".caff");
         Path gif_path = Paths.get(TMP_GIF_FOLDER_PATH + "/" + uuid + ".gif");
@@ -34,7 +43,7 @@ public class MediaService {
         } catch (IOException e) {
             System.out.println("An error occurred while creating tmp caff file.");
             e.printStackTrace();
-            return;
+            return -1L;
         }
 
         Runtime rt = Runtime.getRuntime();
@@ -43,7 +52,7 @@ public class MediaService {
         } catch (IOException e) {
             System.out.println("An error occurred while converting caff file.");
             e.printStackTrace();
-            return;
+            return -1L;
         }
 
         byte[] gifContent = null;
@@ -52,7 +61,7 @@ public class MediaService {
         } catch (IOException e) {
             System.out.println("An error occurred while reading tmp gif file.");
             e.printStackTrace();
-            return;
+            return -1L;
         }
         
         try {
@@ -63,8 +72,11 @@ public class MediaService {
             e.printStackTrace();
         }
 
-        //TODO save to database
-        
+        GifFile gifFile = new GifFile();
+        gifFile.setName(name);
+        gifFile.setContent(gifContent);
+        gifFileRepository.save(gifFile);
+        return gifFile.getId();
     }
 
     

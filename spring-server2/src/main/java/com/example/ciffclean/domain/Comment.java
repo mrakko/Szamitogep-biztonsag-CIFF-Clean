@@ -9,7 +9,7 @@ public class Comment {
     @GeneratedValue
     private Long id;
 
-    @Column(name = "GIF_ID")
+    @JoinColumn
     private Long gifId;
 
     // TODO user
