@@ -1,8 +1,8 @@
-package io.swagger.repositories;
+package repositories;
 
 import org.springframework.data.repository.CrudRepository;
 
-import io.swagger.domain.Comment;
+import domain.Comment;
 
 public interface CommentRepository extends CrudRepository<Comment, Long> {
 }

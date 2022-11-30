@@ -1,8 +1,8 @@
-package io.swagger.repositories;
+package repositories;
 
 import org.springframework.data.repository.CrudRepository;
 
-import io.swagger.domain.GifFile;
+import domain.GifFile;
 
 public interface GifFileRepository extends CrudRepository<GifFile, Long> {
 }
