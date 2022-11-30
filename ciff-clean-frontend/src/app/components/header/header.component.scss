@@ -1,0 +1,11 @@
+mat-toolbar {
+  position: fixed;
+
+  .header-logo{
+    cursor: pointer;
+  }
+
+  .header-spacer {
+    flex: 1 auto;
+  }
+}

@@ -1,6 +1,46 @@
-<div class="login-container">
+<div class="flex-center max-height">
   <form [formGroup]="registerForm" (ngSubmit)="register()">
     <h1>Register</h1>
+    <div class="register-container">
+      <mat-form-field appearance="fill" class="field">
+        <mat-label>Email</mat-label>
+        <input matInput placeholder="adam@example.com" [formControl]="emailControl">
+        <mat-error *ngIf="emailControl.invalid">{{getErrorMessage(emailControl)}}</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="fill" class="field"
+                      [class.margin-bottom]="passwordControl.hasError('strong') && passwordControl.touched">
+        <mat-label>Password</mat-label>
+        <input matInput [formControl]="passwordControl" [type]="hidePassword ? 'password' : 'text'">
+        <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="hidePassword">
+          <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+        <mat-error *ngIf="passwordControl.invalid">{{getErrorMessage(passwordControl)}}</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="fill" class="field">
+        <mat-label>Password confirmation</mat-label>
+        <input matInput [formControl]="confirmControl" [type]="hideConfirm ? 'password' : 'text'">
+        <button mat-icon-button matSuffix (click)="hideConfirm = !hideConfirm" [attr.aria-label]="'Hide password'"
+                [attr.aria-pressed]="hideConfirm">
+          <mat-icon>{{hideConfirm ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+        <mat-error *ngIf="confirmControl.invalid">{{getErrorMessage(confirmControl)}}</mat-error>
+      </mat-form-field>
+
+
+      <mat-form-field appearance="fill" class="field">
+        <mat-label>Full name</mat-label>
+        <input matInput placeholder="adam@example.com" [formControl]="fullNameControl">
+        <mat-error *ngIf="fullNameControl.invalid">{{getErrorMessage(fullNameControl)}}</mat-error>
+      </mat-form-field>
+      <mat-form-field appearance="fill" class="field">
+        <mat-label>Address</mat-label>
+        <input matInput placeholder="adam@example.com" [formControl]="addressControl">
+        <mat-error *ngIf="addressControl.invalid">{{getErrorMessage(addressControl)}}</mat-error>
+      </mat-form-field>
+    </div>
+    <div *ngIf="registerForm.hasError('noMatch') && passwordControl.touched && confirmControl.touched"
+         class="errormessage">Given passwords don't match</div>
 
     <button mat-raised-button color="primary" type="submit" [disabled]="!registerForm.valid">Register</button>
   </form>
