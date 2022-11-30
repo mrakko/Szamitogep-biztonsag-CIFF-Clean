@@ -23,10 +23,20 @@ public class JwtTokenUtil implements Serializable {
 
     public Optional<String> getTokenFromHeader(String authHeader) {
         if (authHeader != null) {
-            String[] components = authHeader.split("\s+");
+            String[] components = authHeader.split("\\s+");
             if (components.length != 2 || !components[0].equals("Bearer"))
                 return Optional.empty();
             return Optional.of(components[1]);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<Long> getUserIdFromToken(String authHeader){
+        var token = getTokenFromHeader(authHeader);
+        if(token != null){
+            Claims claims = getAllClaimsFromToken(token.get());
+            var res = doGetUserId(claims);
+            return Optional.of(res);
         }
         return Optional.empty();
     }
