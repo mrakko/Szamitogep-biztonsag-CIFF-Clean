@@ -23,15 +23,11 @@ parser/*.exe
 /ciff-clean-frontend/.c9/
 /ciff-clean-frontend/*.launch
 /ciff-clean-frontend/.settings/
-*.sublime-workspace
+/ciff-clean-frontend/*.sublime-workspace
 
 # Visual Studio Code
-/ciff-clean-frontend.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.history/*
+/ciff-clean-frontend/.vscode/*
+/ciff-clean-frontend/.history/*
 
 # Miscellaneous
 /ciff-clean-frontend/.angular/cache
