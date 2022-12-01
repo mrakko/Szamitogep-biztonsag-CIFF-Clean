@@ -5,16 +5,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+import com.example.ciffclean.domain.AppUser;
 import com.example.ciffclean.domain.Comment;
 import com.example.ciffclean.domain.GifFile;
 import com.example.ciffclean.models.CreateCommentDTO;
 import com.example.ciffclean.repositories.CommentRepository;
 import com.example.ciffclean.repositories.GifFileRepository;
+import com.example.ciffclean.repositories.UserRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -26,10 +29,12 @@ public class MediaService {
     
     private final GifFileRepository gifFileRepository;
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
 
-    public MediaService(GifFileRepository gifFileRepository, CommentRepository commentRepository) {
+    public MediaService(GifFileRepository gifFileRepository, CommentRepository commentRepository, UserRepository userRepository) {
         this.gifFileRepository = gifFileRepository;
         this.commentRepository = commentRepository;
+        this.userRepository = userRepository;
     }
     
     public Long addCaff(byte[] content, String name, Long userId){
@@ -91,12 +96,17 @@ public class MediaService {
 
     @Transactional
     public void commentFile(CreateCommentDTO body, Long currentUserId) {
+        Optional<AppUser> result = userRepository.findById(currentUserId);
+        if(result.isEmpty()){
+            throw new IllegalArgumentException();
+        }
+        AppUser currentUser = result.get();
         var file = gifFileRepository.findById(body.getFileId());
         if(file.equals(Optional.empty())){
             throw new IllegalArgumentException();
         }
         Comment newComment = new Comment();
-        newComment.setUserId(currentUserId);
+        newComment.setUser(currentUser);
         newComment.setGifId(body.getFileId());
         newComment.setText(body.getText());
         var saved = commentRepository.save(newComment);
@@ -109,10 +119,25 @@ public class MediaService {
 
     public void deleteFile(Long gifId) {
         var gif = gifFileRepository.findById(gifId);
-        if(gif.equals(Optional.empty())){
+        if(gif.isEmpty()){
             throw new IllegalArgumentException();
         }
-        gifFileRepository.deleteById(gifId);
+        gifFileRepository.delete(gif.get());
     }
 
+    public List<GifFile> findFiles(String name){
+        return gifFileRepository.findByNameContains(name);
+    }
+
+    public GifFile editFileName(Long id, String name){
+        Optional<GifFile> result = gifFileRepository.findById(id);
+        if (result.isEmpty()){
+            throw new IllegalArgumentException();
+        }
+        GifFile gifFile = result.get();
+        gifFile.setName(name);
+        gifFileRepository.save(gifFile);
+        return gifFile;
+    }
 }
+

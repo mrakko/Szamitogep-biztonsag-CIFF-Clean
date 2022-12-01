@@ -1,5 +1,7 @@
 package com.example.ciffclean.domain;
 
+import com.example.ciffclean.models.CommentDTO;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -12,8 +14,9 @@ public class Comment {
     @JoinColumn
     private Long gifId;
 
-    @JoinColumn
-    private Long userId;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private AppUser user;
 
     @Column
     private String text;
@@ -30,10 +33,18 @@ public class Comment {
     public void setGifId(Long gifId) {
         this.gifId = gifId;
     }
-    public Long getUserId() {
-        return userId;
+    public AppUser getUser() {
+        return user;
     }
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUser(AppUser user) {
+        this.user = user;
+    }
+
+    public CommentDTO toCommentDTO(){
+        CommentDTO dto = new CommentDTO();
+        dto.setId(id.intValue());
+        dto.setText(text);
+        dto.setCommenter(user.toPublicUserDTO());
+        return dto;
     }
 }

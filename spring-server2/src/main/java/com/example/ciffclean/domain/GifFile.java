@@ -3,6 +3,9 @@ package com.example.ciffclean.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.ciffclean.models.CommentDTO;
+import com.example.ciffclean.models.MediaDTO;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -36,4 +39,16 @@ public class GifFile {
     public void setComments(ArrayList<Comment> comments) { this.comments = comments; }
     public void setContent(byte[] content) { this.content = content; }
     public void setUserId(Long userId) { this.userId = userId; }
+
+    public MediaDTO toMediaDTO(){
+        MediaDTO dto = new MediaDTO();
+        dto.setFileId(id.intValue());
+        ArrayList<CommentDTO> dtos = new ArrayList<CommentDTO>();
+        for (Comment comment : comments) {
+            dtos.add(comment.toCommentDTO());
+        }
+        dto.setComments(dtos);
+        dto.setFileName(name);
+        return dto;
+    }
 }

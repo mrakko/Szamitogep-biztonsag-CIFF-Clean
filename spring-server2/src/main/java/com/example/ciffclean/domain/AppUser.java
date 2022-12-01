@@ -3,6 +3,7 @@ package com.example.ciffclean.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.ciffclean.models.PublicUserDTO;
 import com.example.ciffclean.models.UserRole;
 
 import jakarta.persistence.*;
@@ -54,4 +55,11 @@ public class AppUser {
       public void setAddress(String value) {
         this.address = value;
       }
+
+    public PublicUserDTO toPublicUserDTO(){
+      PublicUserDTO dto = new PublicUserDTO();
+      dto.setFullName(fullName);
+      dto.setId(id.intValue());
+      return dto;
+    }
 }
