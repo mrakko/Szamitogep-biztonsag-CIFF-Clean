@@ -28,7 +28,7 @@ public class UserController {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<UserDTO> getUser(@RequestHeader(value = "Authorization") String authorization){
         try {
             Long currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
@@ -42,7 +42,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("")
+    @PutMapping
     public ResponseEntity<UserDTO> editUser(@RequestBody EditUserDTO editUserDTO,
         @RequestHeader(value = "Authorization") String authorization){
         try {

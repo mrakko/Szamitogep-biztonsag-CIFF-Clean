@@ -22,6 +22,7 @@ public class GifFile {
     @Basic(fetch = FetchType.LAZY)
     private byte[] content;
 
+    @JoinColumn
     private Long userId;
 
     public Long getId() { return this.id; }

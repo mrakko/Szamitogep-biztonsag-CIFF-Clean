@@ -1,7 +1,6 @@
 package com.example.ciffclean.models;
 
 import com.example.ciffclean.domain.AppUser;
-import com.example.ciffclean.domain.UserRole;
 
 public class UserDTO   {
   private Long id;

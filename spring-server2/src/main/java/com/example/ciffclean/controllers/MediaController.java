@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.ciffclean.domain.UserRole;
 import com.example.ciffclean.models.CreateCommentDTO;
+import com.example.ciffclean.models.UserRole;
 import com.example.ciffclean.service.JwtTokenUtil;
 import com.example.ciffclean.service.MediaService;
 import com.example.ciffclean.service.UserService;

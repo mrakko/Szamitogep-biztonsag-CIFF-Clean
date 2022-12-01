@@ -3,6 +3,8 @@ package com.example.ciffclean.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.ciffclean.models.UserRole;
+
 import jakarta.persistence.*;
 
 @Entity

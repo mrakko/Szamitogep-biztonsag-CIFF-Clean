@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
@@ -14,6 +15,8 @@ import com.example.ciffclean.domain.GifFile;
 import com.example.ciffclean.models.CreateCommentDTO;
 import com.example.ciffclean.repositories.CommentRepository;
 import com.example.ciffclean.repositories.GifFileRepository;
+
+import jakarta.transaction.Transactional;
 
 @Component
 public class MediaService {
@@ -86,9 +89,10 @@ public class MediaService {
         return gifFile.getId();
     }
 
+    @Transactional
     public void commentFile(CreateCommentDTO body, Long currentUserId) {
         var file = gifFileRepository.findById(body.getFileId());
-        if(file == null){
+        if(file.equals(Optional.empty())){
             throw new IllegalArgumentException();
         }
         Comment newComment = new Comment();
@@ -104,6 +108,10 @@ public class MediaService {
     }
 
     public void deleteFile(Long gifId) {
+        var gif = gifFileRepository.findById(gifId);
+        if(gif.equals(Optional.empty())){
+            throw new IllegalArgumentException();
+        }
         gifFileRepository.deleteById(gifId);
     }
 

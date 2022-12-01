@@ -1,6 +1,7 @@
 package com.example.ciffclean.service;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,8 @@ import com.example.ciffclean.models.EditUserDTO;
 import com.example.ciffclean.models.UserDTO;
 import com.example.ciffclean.repositories.GifFileRepository;
 import com.example.ciffclean.repositories.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 @Component
 public class UserService {
@@ -21,20 +24,21 @@ public class UserService {
     
     public UserDTO getUser(Long currentUserId) throws Exception {
         var user = userRepository.findById(currentUserId);
-        if(user == null){
+        if(user.equals(Optional.empty())){
             throw new NoSuchElementException("Unauthorized.");
         }
         var res = new UserDTO(user.get());
 
         var image = gifFileRepository.findById(user.get().getImageId());
-        if(image != null){ res.setImage(image.get().getContent());}
+        if(!image.equals(Optional.empty())){ res.setImage(image.get().getContent());}
 
         return res;
     }
 
+    @Transactional
     public UserDTO editUser(EditUserDTO user, Long currentUserId) throws Exception{
         var userToEdit = userRepository.findById(currentUserId);
-        if(userToEdit == null){
+        if(userToEdit.equals(Optional.empty())){
             throw new NoSuchElementException("Unauthorized.");
         }
 
@@ -49,7 +53,7 @@ public class UserService {
         userRepository.save(editedUser);
 
         var image = gifFileRepository.findById(editedUser.getImageId());
-        if(image != null){ res.setImage(image.get().getContent());}
+        if(!image.equals(Optional.empty())){ res.setImage(image.get().getContent());}
 
         return res;
     }
