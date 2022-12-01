@@ -1,8 +1,6 @@
 package com.example.ciffclean.controllers;
 
 import java.util.NoSuchElementException;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ciffclean.models.EditUserDTO;
 import com.example.ciffclean.models.UserDTO;
-import com.example.ciffclean.repositories.GifFileRepository;
-import com.example.ciffclean.repositories.UserRepository;
 import com.example.ciffclean.service.JwtTokenUtil;
 import com.example.ciffclean.service.UserService;
 
@@ -39,7 +35,7 @@ public class UserController {
             var res = userService.getUser(currentUserId);
             return ResponseEntity.ok(res);
         } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -54,9 +50,7 @@ public class UserController {
             var res = userService.editUser(editUserDTO, currentUserId);
             return ResponseEntity.ok(res);
         } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

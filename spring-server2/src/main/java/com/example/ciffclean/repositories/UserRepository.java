@@ -2,7 +2,7 @@ package com.example.ciffclean.repositories;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.example.ciffclean.domain.User;
+import com.example.ciffclean.domain.AppUser;
 
-public interface UserRepository extends CrudRepository<User, Long> {
+public interface UserRepository extends CrudRepository<AppUser, Long> {
 }

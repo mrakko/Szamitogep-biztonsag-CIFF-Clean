@@ -1,6 +1,6 @@
 package com.example.ciffclean.models;
 
-import com.example.ciffclean.domain.User;
+import com.example.ciffclean.domain.AppUser;
 import com.example.ciffclean.domain.UserRole;
 
 public class UserDTO   {
@@ -17,7 +17,7 @@ public class UserDTO   {
   private byte[] profileImage;
 
   public UserDTO(){}
-  public UserDTO(User user){
+  public UserDTO(AppUser user){
     this.id = user.getId();
     this.role = user.getRole();
     this.fullName = user.getFullName();

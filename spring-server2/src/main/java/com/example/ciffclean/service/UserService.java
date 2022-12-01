@@ -22,7 +22,7 @@ public class UserService {
     public UserDTO getUser(Long currentUserId) throws Exception {
         var user = userRepository.findById(currentUserId);
         if(user == null){
-            throw new NoSuchElementException("No logged in user");
+            throw new NoSuchElementException("Unauthorized.");
         }
         var res = new UserDTO(user.get());
 
@@ -33,16 +33,12 @@ public class UserService {
     }
 
     public UserDTO editUser(EditUserDTO user, Long currentUserId) throws Exception{
-        if(currentUserId != user.getId()){
-            throw new IllegalArgumentException("Users can modify only their own personal data.");
-        }
         var userToEdit = userRepository.findById(currentUserId);
         if(userToEdit == null){
-            throw new NoSuchElementException("No logged in user");
+            throw new NoSuchElementException("Unauthorized.");
         }
 
-        // TODO profilkép változása ?
-        // TODO edituserdto missing id in yaml
+        // TODO profilkép változása?
         var editedUser = userToEdit.get();
         editedUser.setFullName(user.getFullName());
         editedUser.setEmail(user.getEmail());

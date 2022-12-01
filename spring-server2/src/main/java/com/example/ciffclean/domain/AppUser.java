@@ -3,7 +3,7 @@ package com.example.ciffclean.domain;
 import jakarta.persistence.*;
 
 @Entity
-public class User {
+public class AppUser {
     
     @Id
     @GeneratedValue

@@ -35,6 +35,7 @@ public class JwtTokenUtil implements Serializable {
         var token = getTokenFromHeader(authHeader);
         if(token != null){
             Claims claims = getAllClaimsFromToken(token.get());
+            if(isExpired(claims)) {return Optional.empty();}
             var res = doGetUserId(claims);
             return Optional.of(res);
         }
