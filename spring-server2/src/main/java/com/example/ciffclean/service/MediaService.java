@@ -81,6 +81,7 @@ public class MediaService {
         GifFile gifFile = new GifFile();
         gifFile.setName(name);
         gifFile.setContent(gifContent);
+        gifFile.setUserId(userId);
         gifFileRepository.save(gifFile);
         return gifFile.getId();
     }
@@ -106,5 +107,4 @@ public class MediaService {
         gifFileRepository.deleteById(gifId);
     }
 
-    
 }
