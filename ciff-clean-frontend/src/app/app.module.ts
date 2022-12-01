@@ -16,6 +16,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { MainLayoutComponent } from './components/main-layout/main-layout.component';
 import { FileListComponent } from './components/file-list/file-list.component';
 import { ProfileComponent } from './components/profile/profile.component';
+import { DetailsComponent } from './components/details/details.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { ProfileComponent } from './components/profile/profile.component';
     HeaderComponent,
     MainLayoutComponent,
     FileListComponent,
-    ProfileComponent
+    ProfileComponent,
+    DetailsComponent
   ],
     imports: [
         BrowserModule,

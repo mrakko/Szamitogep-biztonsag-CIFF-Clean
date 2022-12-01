@@ -6,6 +6,7 @@ import {MainLayoutComponent} from "./components/main-layout/main-layout.componen
 import {FileListComponent} from "./components/file-list/file-list.component";
 import {AuthGuard} from "./guards/auth.guard";
 import {ProfileComponent} from "./components/profile/profile.component";
+import {DetailsComponent} from "./components/details/details.component";
 
 const routes: Routes = [
   {path: '', redirectTo: '/login', pathMatch: 'full'},
@@ -14,6 +15,7 @@ const routes: Routes = [
   {
     path: '', component: MainLayoutComponent, children: [
       { path: 'file-list', component: FileListComponent, canActivate: [AuthGuard] },
+      { path: 'details/:name', component: DetailsComponent, canActivate: [AuthGuard] },
       { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
     ]
   }
