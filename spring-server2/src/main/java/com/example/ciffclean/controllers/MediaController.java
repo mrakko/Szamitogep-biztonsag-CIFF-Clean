@@ -31,7 +31,7 @@ import com.example.ciffclean.service.UserService;
 @RestController
 @RequestMapping("/media")
 public class MediaController {
-    
+
     // TODO log
 
     @Autowired
@@ -51,10 +51,11 @@ public class MediaController {
                 mediaService.commentFile(body, currentUserId);
                 return ResponseEntity.ok().build();
             } catch (NoSuchElementException e) {
+                if(e.getMessage().equals(MediaService.FILE_NOT_FOUND)){
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                }
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            } catch (IllegalArgumentException e) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            } catch (Exception e) {
+            }  catch (Exception e) {
                 e.printStackTrace();
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
@@ -62,28 +63,70 @@ public class MediaController {
 
     @DeleteMapping("{id}/delete")
     public ResponseEntity<Void> deleteFile(
-        @PathVariable Long id,    
-        @RequestHeader(value = "Authorization") String authorization) {
-            try {
-                Long currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
-                checkUserRole(currentUserId, UserRole.Admin);
-                mediaService.deleteFile(id);
-                return ResponseEntity.noContent().build();
-            } catch (NoSuchElementException e) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            } catch (IllegalArgumentException e) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-            } catch (Exception e) {
-                e.printStackTrace();
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization") String authorization) {
+        try {
+            Long currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
+            checkUserRole(currentUserId, UserRole.Admin);
+            mediaService.deleteFile(id);
+            return ResponseEntity.noContent().build();
+        } catch (NoSuchElementException e) {
+            if(e.getMessage().equals(MediaService.FILE_NOT_FOUND)){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("{id}/download")
+    public ResponseEntity<byte[]> downloadFile(@PathVariable("id") Long id,
+            @RequestHeader(value = "Authorization") String authorization) {
+        try {
+            jwtTokenUtil.checkIfUserIsAuthenticated(authorization);
+            var res = mediaService.downloadFile(id);
+            return ResponseEntity.ok(res);
+        } catch (NoSuchElementException e) {
+            if(e.getMessage().equals(MediaService.FILE_NOT_FOUND)){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<MediaDTO>> getFiles(@RequestHeader(value = "Authorization") String authorization) {
+        try {
+            jwtTokenUtil.checkIfUserIsAuthenticated(authorization);
+            List<GifFile> results = mediaService.findFiles("");
+            ArrayList<MediaDTO> dtos = new ArrayList<MediaDTO>();
+            for (GifFile gifFile : results) {
+                dtos.add(gifFile.toMediaDTO());
+            }
+            return ResponseEntity.ok().body(dtos);
+        } catch (NoSuchElementException e) {
+            if(e.getMessage().equals(MediaService.FILE_NOT_FOUND)){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping("search")
     public ResponseEntity<List<MediaDTO>> searchFile(
         @RequestParam String query
     ) {
-        List<GifFile> results = mediaService.findGifFiles(query);
+        List<GifFile> results = mediaService.findFiles(query);
         ArrayList<MediaDTO> dtos = new ArrayList<MediaDTO>();
         for (GifFile gifFile : results) {
             dtos.add(gifFile.toMediaDTO());
@@ -100,12 +143,14 @@ public class MediaController {
         try {
             Long currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
             // TODO auth
+            jwtTokenUtil.checkIfUserIsAuthenticated(authorization);
             GifFile gifFile = mediaService.editFileName(file_id, body.getFileName());
 
             return ResponseEntity.ok().body(gifFile.toMediaDTO());
         } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        } catch (IllegalArgumentException e) {
+            if(e.getMessage().equals(MediaService.FILE_NOT_FOUND)){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -121,6 +166,7 @@ public class MediaController {
         try {
             Long currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
             // TODO auth
+            jwtTokenUtil.checkIfUserIsAuthenticated(authorization);
             byte[] content = IOUtils.toByteArray(file.getInputStream());
             Long id = mediaService.addCaff(content, file.getName(), currentUserId);
             if (id == -1L){
@@ -128,8 +174,9 @@ public class MediaController {
             }
             return ResponseEntity.ok().body(id);
         } catch (NoSuchElementException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        } catch (IllegalArgumentException e) {
+            if(e.getMessage().equals(MediaService.FILE_NOT_FOUND)){
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
@@ -137,10 +184,10 @@ public class MediaController {
         }
     }
 
-    private void checkUserRole(Long currentUserId, UserRole admin) throws Exception {
+    private void checkUserRole(Long currentUserId, UserRole role) throws Exception {
         var user = userService.getUser(currentUserId);
-        if(!user.getRole().equals(admin)){
-            throw new IllegalArgumentException("Only users are allowed to delete files");
+        if (!user.getRole().equals(role)) {
+            throw new IllegalArgumentException("Role mismatch");
         }
     }
 }

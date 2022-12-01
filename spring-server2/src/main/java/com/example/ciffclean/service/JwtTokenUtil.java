@@ -25,7 +25,7 @@ public class JwtTokenUtil implements Serializable {
     public Long getCurrentUserId(String authorization){
         var id = getUserIdFromToken(authorization);
         if(id == null){
-            throw new NoSuchElementException();
+            throw new NoSuchElementException(MediaService.USER_NOT_FOUND);
         }
         return id.get();
     }
@@ -42,13 +42,20 @@ public class JwtTokenUtil implements Serializable {
 
     public Optional<Long> getUserIdFromToken(String authHeader){
         var token = getTokenFromHeader(authHeader);
-        if(token != null){
+        if(!token.isEmpty()){
             Claims claims = getAllClaimsFromToken(token.get());
             if(isExpired(claims)) {return Optional.empty();}
             var res = doGetUserId(claims);
             return Optional.of(res);
         }
         return Optional.empty();
+    }
+
+    public void checkIfUserIsAuthenticated(String authHeader){
+        var userId = getUserIdFromToken(authHeader);
+        if(userId.isEmpty()){
+           throw new NoSuchElementException(MediaService.USER_NOT_FOUND); 
+        }
     }
 
     public boolean isValidToken(String token, Long userId) {

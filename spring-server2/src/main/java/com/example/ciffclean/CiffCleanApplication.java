@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 @SpringBootApplication
-@EntityScan("com.example.ciffclean.domain")
+@EntityScan("com.example.ciffclean")
 public class CiffCleanApplication {
 
 	public static void main(String[] args) {

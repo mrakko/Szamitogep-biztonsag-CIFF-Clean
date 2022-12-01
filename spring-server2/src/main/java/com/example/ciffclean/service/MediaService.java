@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,6 +27,8 @@ public class MediaService {
 
     private static final String TMP_CAFF_FOLDER_PATH = "tmp/caff";
     private static final String TMP_GIF_FOLDER_PATH = "tmp/gif";
+    public static final String FILE_NOT_FOUND = "File not found";
+    public static final String USER_NOT_FOUND = "User not found";
     
     private final GifFileRepository gifFileRepository;
     private final CommentRepository commentRepository;
@@ -102,8 +105,8 @@ public class MediaService {
         }
         AppUser currentUser = result.get();
         var file = gifFileRepository.findById(body.getFileId());
-        if(file.equals(Optional.empty())){
-            throw new IllegalArgumentException();
+        if(file.isEmpty()){
+            throw new NoSuchElementException(FILE_NOT_FOUND);
         }
         Comment newComment = new Comment();
         newComment.setUser(currentUser);
@@ -116,11 +119,12 @@ public class MediaService {
         file.get().setComments(newComments);
         
     }
-
+    
+    @Transactional
     public void deleteFile(Long gifId) {
         var gif = gifFileRepository.findById(gifId);
         if(gif.isEmpty()){
-            throw new IllegalArgumentException();
+            throw new NoSuchElementException(FILE_NOT_FOUND);
         }
         gifFileRepository.delete(gif.get());
     }
@@ -129,15 +133,25 @@ public class MediaService {
         return gifFileRepository.findByNameContains(name);
     }
 
+    @Transactional
     public GifFile editFileName(Long id, String name){
         Optional<GifFile> result = gifFileRepository.findById(id);
         if (result.isEmpty()){
-            throw new IllegalArgumentException();
+            throw new NoSuchElementException(FILE_NOT_FOUND);
         }
         GifFile gifFile = result.get();
         gifFile.setName(name);
         gifFileRepository.save(gifFile);
         return gifFile;
     }
+    
+    public byte[] downloadFile(Long id) {
+        var file = gifFileRepository.findById(id);
+        if(file.isEmpty()){
+            throw new NoSuchElementException(FILE_NOT_FOUND);
+        }
+        return file.get().getContent();
+    }
+
 }
 
