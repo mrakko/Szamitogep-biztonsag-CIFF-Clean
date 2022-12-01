@@ -1,5 +1,8 @@
 package com.example.ciffclean.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -9,33 +12,36 @@ public class AppUser {
     @GeneratedValue
     private Long id;
 
-    public Long getId(){ return id;}
-
     @Column
     private String fullName;
 
-    public String getFullName(){ return fullName;}
-
     @Column
     private UserRole role;
-
-    public UserRole getRole(){ return role;}
     
     @Column
     private String address;
 
-    public String getAddress(){ return address;}
-
     @Column
     private String email;
 
-    public String getEmail(){ return email;}
-
-    // TODO ez string vagy ciff hivatkozás?
     @JoinColumn
     private Long imageId;
 
+    @OneToMany(cascade = CascadeType.MERGE, mappedBy="userId", orphanRemoval = true)
+    private List<GifFile> gifFiles = new ArrayList<GifFile>();
+
+    public Long getId(){ return id;}
+
+    public String getFullName(){ return fullName;}
+
     public Long getImageId(){ return imageId;}
+
+    public UserRole getRole(){ return role;}
+
+    public String getAddress(){ return address;}
+
+    public String getEmail(){ return email;}
+
 
     public void setFullName(String value) {
         this.fullName = value;

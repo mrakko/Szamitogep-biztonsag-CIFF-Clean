@@ -4,10 +4,13 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.example.ciffclean.domain.UserRole;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -20,6 +23,14 @@ public class JwtTokenUtil implements Serializable {
     private String secret;
     
     private final int tokenExpiryTime = 24 * 60 * 60 * 60 * 1000; //1 nap
+
+    public Long getCurrentUserId(String authorization){
+        var id = getUserIdFromToken(authorization);
+        if(id == null){
+            throw new NoSuchElementException();
+        }
+        return id.get();
+    }
 
     public Optional<String> getTokenFromHeader(String authHeader) {
         if (authHeader != null) {

@@ -4,11 +4,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import org.springframework.stereotype.Component;
 
+import com.example.ciffclean.domain.Comment;
 import com.example.ciffclean.domain.GifFile;
+import com.example.ciffclean.models.CreateCommentDTO;
+import com.example.ciffclean.repositories.CommentRepository;
 import com.example.ciffclean.repositories.GifFileRepository;
 
 @Component
@@ -18,9 +22,11 @@ public class MediaService {
     private static final String TMP_GIF_FOLDER_PATH = "tmp/gif";
     
     private final GifFileRepository gifFileRepository;
+    private final CommentRepository commentRepository;
 
-    public MediaService(GifFileRepository gifFileRepository) {
+    public MediaService(GifFileRepository gifFileRepository, CommentRepository commentRepository) {
         this.gifFileRepository = gifFileRepository;
+        this.commentRepository = commentRepository;
     }
     
     public Long addCaff(byte[] content, String name, Long userId){
@@ -77,6 +83,27 @@ public class MediaService {
         gifFile.setContent(gifContent);
         gifFileRepository.save(gifFile);
         return gifFile.getId();
+    }
+
+    public void commentFile(CreateCommentDTO body, Long currentUserId) {
+        var file = gifFileRepository.findById(body.getFileId());
+        if(file == null){
+            throw new IllegalArgumentException();
+        }
+        Comment newComment = new Comment();
+        newComment.setUserId(currentUserId);
+        newComment.setGifId(body.getFileId());
+        newComment.setText(body.getText());
+        var saved = commentRepository.save(newComment);
+
+        var newComments = new ArrayList<Comment>(file.get().getComments());
+        newComments.add(saved);
+        file.get().setComments(newComments);
+        
+    }
+
+    public void deleteFile(Long gifId) {
+        gifFileRepository.deleteById(gifId);
     }
 
     

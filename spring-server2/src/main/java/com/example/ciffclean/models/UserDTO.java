@@ -16,6 +16,10 @@ public class UserDTO   {
 
   private byte[] profileImage;
 
+  public byte[] getProfileImage() {
+    return profileImage;
+  }
+  
   public UserDTO(){}
   public UserDTO(AppUser user){
     this.id = user.getId();
@@ -25,9 +29,30 @@ public class UserDTO   {
     this.email = user.getEmail();
   }
 
+  public Long getId() {
+    return id;
+  }
+
+  public UserRole getRole() {
+    return role;
+  }
+
+  public String getFullName() {
+    return fullName;
+  }
+
+  public String getAddress() {
+    return address;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
   public void setImage(byte[] value){
     this.profileImage = value;
   }
+
   public void setFullName(String value) {
     this.fullName = value;
   }

@@ -31,7 +31,7 @@ public class UserController {
     @GetMapping("")
     public ResponseEntity<UserDTO> getUser(@RequestHeader(value = "Authorization") String authorization){
         try {
-            Long currentUserId = getCurrentUserId(authorization);
+            Long currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
             var res = userService.getUser(currentUserId);
             return ResponseEntity.ok(res);
         } catch (NoSuchElementException e) {
@@ -46,7 +46,7 @@ public class UserController {
     public ResponseEntity<UserDTO> editUser(@RequestBody EditUserDTO editUserDTO,
         @RequestHeader(value = "Authorization") String authorization){
         try {
-            Long currentUserId = getCurrentUserId(authorization);
+            Long currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
             var res = userService.editUser(editUserDTO, currentUserId);
             return ResponseEntity.ok(res);
         } catch (NoSuchElementException e) {
@@ -57,11 +57,5 @@ public class UserController {
         }
     }
 
-    private Long getCurrentUserId(String authorization){
-        var id = jwtTokenUtil.getUserIdFromToken(authorization);
-        if(id == null){
-            throw new NoSuchElementException();
-        }
-        return id.get();
-    }
+
 }
