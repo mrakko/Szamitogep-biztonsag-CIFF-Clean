@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
+import { UserDTO } from '../networking';
 
 const TOKEN_KEY = 'auth-token';
+const USER_KEY = 'auth-user';
 
 @Injectable({
   providedIn: 'root'
 })
-
 export class TokenStorageService {
   constructor() { }
 
@@ -20,5 +21,18 @@ export class TokenStorageService {
 
   public getToken(): string | null {
     return window.sessionStorage.getItem(TOKEN_KEY);
+  }
+
+  public saveUser(user: UserDTO): void {
+    window.sessionStorage.removeItem(USER_KEY);
+    window.sessionStorage.setItem(USER_KEY, JSON.stringify(user));
+  }
+
+  public getUser(): UserDTO | null {
+    const user = window.sessionStorage.getItem(USER_KEY);
+    if (user) {
+      return JSON.parse(user);
+    }
+    return {};
   }
 }

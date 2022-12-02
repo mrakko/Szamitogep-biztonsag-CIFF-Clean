@@ -46,6 +46,7 @@ import { AuthGuard } from './guards/auth.guard';
         MatTableModule
     ],
   providers: [
+    AuthGuard,
     { 
       provide: HTTP_INTERCEPTORS, 
       useClass: AuthInterceptor, 
