@@ -3,9 +3,6 @@ package com.example.ciffclean.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 import com.example.ciffclean.models.CommentDTO;
 import com.example.ciffclean.models.MediaDTO;
 
@@ -28,6 +25,10 @@ public class GifFile {
     @Basic(fetch = FetchType.LAZY)
     private byte[] content;
 
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
+    private byte[] caff;
+
     @JoinColumn
     private Long userId;
 
@@ -36,12 +37,14 @@ public class GifFile {
     public List<Comment> getComments() { return this.comments; }
     public byte[] getContent() { return content; }
     public Long getUserId() { return userId; }
+    public byte[] getCaff() { return caff; }
 
     public void setId(Long id) { this.id = id; }
     public void setName(String name) { this.name = name; }
     public void setComments(ArrayList<Comment> comments) { this.comments = comments; }
     public void setContent(byte[] content) { this.content = content; }
     public void setUserId(Long userId) { this.userId = userId; }
+    public void setCaff(byte[] caff) { this.caff = caff; }
     public void addComment(Comment c){this.comments.add(c);}
 
     public MediaDTO toMediaDTO(){

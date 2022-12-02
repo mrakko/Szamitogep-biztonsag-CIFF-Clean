@@ -4,13 +4,11 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import org.hibernate.Hibernate;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,6 @@ import com.example.ciffclean.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 
 import com.example.ciffclean.domain.AppUser;
-import com.example.ciffclean.domain.Comment;
 import com.example.ciffclean.domain.GifFile;
 import com.example.ciffclean.models.CreateCommentDTO;
 
@@ -87,7 +84,7 @@ public class MediaServiceTest {
 		var id = caff2.a;
 		var data = caff2.b;
 		var res = mediaService.downloadFile(id);
-		// assertArrayEquals(data, res);
+		assertArrayEquals(data, res);
 		assertNotEquals(res.length, 0);
 	}
 

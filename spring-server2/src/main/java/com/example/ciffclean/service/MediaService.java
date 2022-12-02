@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -13,7 +12,6 @@ import java.util.UUID;
 
 import javax.sql.rowset.serial.SerialException;
 
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Component;
 
 import com.example.ciffclean.domain.AppUser;
@@ -72,8 +70,9 @@ public class MediaService {
 
         Runtime rt = Runtime.getRuntime();
         try {
-            rt.exec(new String[]{"parser.exe", caff_path.toString(), gif_path.toString()});
-        } catch (IOException e) {
+            var p = rt.exec(new String[]{"parser.exe", caff_path.toString(), gif_path.toString()});
+            p.waitFor();
+        } catch (IOException | InterruptedException e) {
             System.out.println("An error occurred while converting caff file.");
             e.printStackTrace();
             return -1L;
@@ -99,6 +98,7 @@ public class MediaService {
         GifFile gifFile = new GifFile();
         gifFile.setName(name);
         gifFile.setContent(gifContent);
+        gifFile.setCaff(content);
         gifFile.setUserId(userId);
         gifFileRepository.save(gifFile);
         return gifFile.getId();
@@ -152,13 +152,11 @@ public class MediaService {
     }
     
     public byte[] downloadFile(Long id) {
-        // var file = gifFileRepository.findByIdWithByteContent(id);
-        // // var file = gifFileRepository.findById(id);
-        // if(file.isEmpty()){
-        //     throw new NoSuchElementException(FILE_NOT_FOUND);
-        // }
-        // return file.get();
-        return null;
+        var file = gifFileRepository.findById(id);
+        if(file.isEmpty()){
+            throw new NoSuchElementException(FILE_NOT_FOUND);
+        }
+        return file.get().getCaff();
     }
 
 }
