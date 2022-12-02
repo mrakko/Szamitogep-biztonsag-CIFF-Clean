@@ -40,7 +40,7 @@
       </mat-form-field>
     </div>
     <div *ngIf="registerForm.hasError('noMatch') && passwordControl.touched && confirmControl.touched"
-         class="errormessage">Given passwords don't match</div>
+         class="error-message">Given passwords don't match</div>
 
     <button mat-raised-button color="primary" type="submit" [disabled]="!registerForm.valid">Register</button>
   </form>

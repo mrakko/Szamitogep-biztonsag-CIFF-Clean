@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {getErrorMessageUtil} from "../../util/validators";
 
 @Component({
   selector: 'ciff-clean-login',
@@ -25,11 +26,7 @@ export class LoginComponent {
   }
 
   getErrorMessage(control: FormControl): string {
-    if (control.hasError('required')) {
-      return 'You must enter a value';
-    }
-
-    return control.hasError('email') ? 'Not a valid email' : '';
+    return getErrorMessageUtil(control);
   }
 
   login(): void {
