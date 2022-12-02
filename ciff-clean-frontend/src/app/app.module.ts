@@ -17,6 +17,7 @@ import { MainLayoutComponent } from './components/main-layout/main-layout.compon
 import { FileListComponent } from './components/file-list/file-list.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { DetailsComponent } from './components/details/details.component';
+import { MatTableModule } from '@angular/material/table'  
 
 @NgModule({
   declarations: [
@@ -38,7 +39,8 @@ import { DetailsComponent } from './components/details/details.component';
         MatInputModule,
         MatButtonModule,
         MatIconModule,
-        MatToolbarModule
+        MatToolbarModule,
+        MatTableModule
     ],
   providers: [],
   bootstrap: [AppComponent]
