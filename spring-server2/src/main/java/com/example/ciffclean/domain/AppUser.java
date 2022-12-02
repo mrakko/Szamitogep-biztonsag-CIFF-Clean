@@ -10,22 +10,16 @@ import jakarta.persistence.*;
 
 @Entity
 public class AppUser {
-    
-    @Id
-    @GeneratedValue
-    private Long id;
 
-    @Column
-    private String fullName;
+  @Id
+  @GeneratedValue
+  private Long id;
 
-    @Column
-    private UserRole role;
-    
-    @Column
-    private String address;
+  @Column
+  private String fullName;
 
-    @Column
-    private String email;
+  @Column
+  private UserRole role;
 
     private String password;
 
@@ -37,39 +31,66 @@ public class AppUser {
       this.password = password;
     }
 
-    @JoinColumn
-    private Long imageId;
+  @Column
+  private String address;
 
-    @OneToMany(cascade = CascadeType.MERGE, mappedBy="userId", orphanRemoval = true)
-    private List<GifFile> gifFiles = new ArrayList<GifFile>();
+  @Column
+  private String email;
 
-    public Long getId(){ return id;}
+  @JoinColumn
+  private Long imageId;
 
-    public String getFullName(){ return fullName;}
+  public void setImageId(Long imageId) {
+    this.imageId = imageId;
+  }
 
-    public Long getImageId(){ return imageId;}
+  @OneToMany(cascade = CascadeType.MERGE, mappedBy = "userId", orphanRemoval = true)
+  private List<GifFile> gifFiles = new ArrayList<GifFile>();
 
-    public UserRole getRole(){ return role;}
+  public Long getId() {
+    return id;
+  }
 
-    public String getAddress(){ return address;}
+  public String getFullName() {
+    return fullName;
+  }
 
-    public String getEmail(){ return email;}
+  public Long getImageId() {
+    return imageId;
+  }
 
+  public UserRole getRole() {
+    return role;
+  }
 
-    public void setFullName(String value) {
-        this.fullName = value;
-      }
-      public void setEmail(String value) {
-        this.email = value;
-      }
-      public void setAddress(String value) {
-        this.address = value;
-      }
+  public String getAddress() {
+    return address;
+  }
 
-    public PublicUserDTO toPublicUserDTO(){
-      PublicUserDTO dto = new PublicUserDTO();
-      dto.setFullName(fullName);
-      dto.setId(id.intValue());
-      return dto;
-    }
+  public String getEmail() {
+    return email;
+  }
+
+  public void setFullName(String value) {
+    this.fullName = value;
+  }
+
+  public void setEmail(String value) {
+    this.email = value;
+  }
+
+  public void setAddress(String value) {
+    this.address = value;
+  }
+
+  public void setRole(UserRole role) {
+    this.role = role;
+  }
+
+  public PublicUserDTO toPublicUserDTO() {
+    PublicUserDTO dto = new PublicUserDTO();
+    dto.setFullName(fullName);
+    dto.setId(id.intValue());
+    return dto;
+  }
 }

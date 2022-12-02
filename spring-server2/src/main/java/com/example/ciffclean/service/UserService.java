@@ -22,6 +22,9 @@ public class UserService {
     private GifFileRepository gifFileRepository;
     
     public UserDTO getUser(Long currentUserId) throws Exception {
+        if(currentUserId == null){
+            throw new NoSuchElementException("Unauthorized.");
+        }
         var user = userRepository.findById(currentUserId);
         if(user.isEmpty()){
             throw new NoSuchElementException("Unauthorized.");
@@ -29,7 +32,7 @@ public class UserService {
         var res = new UserDTO(user.get());
 
         var image = gifFileRepository.findById(user.get().getImageId());
-        if(!image.isEmpty()){ res.setImage(image.get().getContent());}
+        // TODO if(!image.isEmpty()){ res.setImage(image.get().getContent());}
 
         return res;
     }
@@ -52,7 +55,7 @@ public class UserService {
         userRepository.save(editedUser);
 
         var image = gifFileRepository.findById(editedUser.getImageId());
-        if(!image.isEmpty()){ res.setImage(image.get().getContent());}
+        // TODO if(!image.isEmpty()){ res.setImage(image.get().getContent());}
 
         return res;
     }
