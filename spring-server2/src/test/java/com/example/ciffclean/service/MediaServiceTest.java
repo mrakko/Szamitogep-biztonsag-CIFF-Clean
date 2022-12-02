@@ -19,13 +19,10 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import com.example.ciffclean.repositories.GifFileRepository;
 import com.example.ciffclean.repositories.UserRepository;
 
-import jakarta.transaction.Transactional;
-
 import com.example.ciffclean.domain.AppUser;
 import com.example.ciffclean.domain.GifFile;
 import com.example.ciffclean.models.CreateCommentDTO;
 
-@Transactional
 @SpringBootTest
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 public class MediaServiceTest {

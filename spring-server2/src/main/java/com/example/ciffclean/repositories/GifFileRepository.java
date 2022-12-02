@@ -14,8 +14,5 @@ public interface GifFileRepository extends CrudRepository<GifFile, Long> {
 
     @Query("SELECT gf FROM GifFile gf left join fetch gf.comments WHERE gf.id = :id")
     Optional<GifFile> findByIdWithComments(Long id);
-
-    @Query("SELECT gf.content FROM GifFile gf WHERE gf.id = :id")
-    Optional<byte[]> findByIdWithByteContent(Long id);
 }
 

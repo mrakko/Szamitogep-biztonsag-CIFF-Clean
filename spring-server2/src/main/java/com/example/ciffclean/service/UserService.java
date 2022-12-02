@@ -31,8 +31,10 @@ public class UserService {
         }
         var res = new UserDTO(user.get());
 
-        var image = gifFileRepository.findById(user.get().getImageId());
-        // TODO if(!image.isEmpty()){ res.setImage(image.get().getContent());}
+        if(user.get().getImageId() != null){
+            var image = gifFileRepository.findById(user.get().getImageId());
+            if(!image.isEmpty()){ res.setImage(image.get().getContent());}
+        }
 
         return res;
     }
@@ -44,7 +46,6 @@ public class UserService {
             throw new NoSuchElementException("Unauthorized.");
         }
 
-        // TODO profilkép változása?
         var editedUser = userToEdit.get();
         editedUser.setFullName(user.getFullName());
         editedUser.setEmail(user.getEmail());
@@ -53,9 +54,10 @@ public class UserService {
         var res = new UserDTO(editedUser);
     
         userRepository.save(editedUser);
-
-        var image = gifFileRepository.findById(editedUser.getImageId());
-        // TODO if(!image.isEmpty()){ res.setImage(image.get().getContent());}
+        if(editedUser.getImageId() != null){
+            var image = gifFileRepository.findById(editedUser.getImageId());
+            if(!image.isEmpty()){ res.setImage(image.get().getContent());}
+        }
 
         return res;
     }

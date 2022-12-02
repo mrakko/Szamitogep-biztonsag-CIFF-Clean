@@ -15,12 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.ciffclean.models.EditUserDTO;
 import com.example.ciffclean.models.UserDTO;
 import com.example.ciffclean.service.JwtTokenUtil;
+import com.example.ciffclean.service.LogService;
 import com.example.ciffclean.service.UserService;
 
 @CrossOrigin
 @RestController
 @RequestMapping("/user")
 public class UserController {
+
+    @Autowired
+    private LogService logService;
 
     @Autowired
     private UserService userService;
@@ -32,12 +36,15 @@ public class UserController {
     public ResponseEntity<UserDTO> getUser(@RequestHeader(value = "Authorization") String authorization){
         try {
             Long currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
+            logService.logActivity(currentUserId, "GETUSER", null);
             var res = userService.getUser(currentUserId);
             return ResponseEntity.ok(res);
         } catch (NoSuchElementException e) {
+            logService.logError("UNAUTHORIZED", "GETUSER");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
+            logService.logError(e.getMessage(), "GETUSER");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -47,12 +54,16 @@ public class UserController {
         @RequestHeader(value = "Authorization") String authorization){
         try {
             Long currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
+            logService.logActivity(currentUserId, "EDITUSER START", null);
             var res = userService.editUser(editUserDTO, currentUserId);
+            logService.logActivity(currentUserId, "EDITUSER OK", null);
             return ResponseEntity.ok(res);
         } catch (NoSuchElementException e) {
+            logService.logError("UNAUTHORIZED", "EDITUSER");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
+            logService.logError(e.getMessage(), "EDITUSER");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

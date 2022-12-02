@@ -3,9 +3,7 @@ package com.example.ciffclean.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
-import org.aspectj.lang.annotation.Before;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,19 +25,19 @@ public class UserServiceTest {
 	@Autowired
 	private UserRepository userRepository;
 
-    private AppUser init(){
-        var testUser = new AppUser();
+    private AppUser testUser;
+
+    @BeforeEach
+    public void init(){
+        testUser = new AppUser();
         testUser.setAddress("My address");
         testUser.setFullName("Fullname");
         testUser.setEmail("test@test.com");
         testUser.setRole(UserRole.Regular);
-        return testUser;
     }
 
     @Test
     public void getUserTest() throws Exception{
-        // TODO
-        var testUser = init();
         userRepository.save(testUser);
         var testUserId = testUser.getId();
         assertNotEquals(testUserId, -1L);
@@ -51,8 +49,6 @@ public class UserServiceTest {
 
     @Test
     public void editUserTest() throws Exception{
-        // TODO
-        var testUser = init();
         userRepository.save(testUser);
         var testUserId = testUser.getId();
         assertNotEquals(testUserId, -1L);
