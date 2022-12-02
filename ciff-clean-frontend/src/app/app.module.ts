@@ -18,6 +18,9 @@ import { FileListComponent } from './components/file-list/file-list.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { DetailsComponent } from './components/details/details.component';
 import { MatTableModule } from '@angular/material/table'  
+import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptor } from './services/authentication/auth.interceptor';
+import { AuthGuard } from './guards/auth.guard';
 
 @NgModule({
   declarations: [
@@ -42,7 +45,13 @@ import { MatTableModule } from '@angular/material/table'
         MatToolbarModule,
         MatTableModule
     ],
-  providers: [],
+  providers: [
+    { 
+      provide: HTTP_INTERCEPTORS, 
+      useClass: AuthInterceptor, 
+      multi: true 
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
