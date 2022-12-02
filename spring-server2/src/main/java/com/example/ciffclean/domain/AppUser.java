@@ -27,6 +27,16 @@ public class AppUser {
     @Column
     private String email;
 
+    private String password;
+
+    public String getPassword() {
+      return password;
+    }
+
+    public void setPassword(String password) {
+      this.password = password;
+    }
+
     @JoinColumn
     private Long imageId;
 

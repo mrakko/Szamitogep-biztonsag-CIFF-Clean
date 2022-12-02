@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,6 +36,7 @@ public class AuthController {
             AppUser appUser = new AppUser();
             appUser.setAddress(createUserDTO.getAddress());
             appUser.setEmail(createUserDTO.getEmail());
+            appUser.setPassword(createUserDTO.getPassword());   //TODO: Plaintext helyett cizelláltabban...
             appUser.setFullName(createUserDTO.getFullName());
             AppUser savedUser = userRepository.save(appUser);
             return ResponseEntity.ok(generateUserTokenDTO(savedUser));
@@ -69,8 +69,12 @@ public class AuthController {
             Long userId = Long.valueOf(0);
             Optional<AppUser> appUser = userRepository.findById(userId);
             if(!appUser.isPresent()){   return ResponseEntity.status(HttpStatus.NO_CONTENT).build();}
-            if(appUser.get().getEmail().equals(changeUserPasswordDTO.getOldPassword())){ /*change PWD */} 
-            //TODO: API-t kiegészíteni: PWD!
+            if(appUser.get().getEmail().equals(changeUserPasswordDTO.getOldPassword())){ 
+                AppUser changedUser = appUser.get();
+                changedUser.setPassword(changeUserPasswordDTO.getNewPassword());
+                userRepository.save(changedUser);
+                return ResponseEntity.ok(true);
+            } 
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }catch (Exception e) {
             e.printStackTrace();
