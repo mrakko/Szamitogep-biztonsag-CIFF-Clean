@@ -4,3 +4,5 @@ parser/obj
 parser/data/*.gif
 parser/*.d
 parser/*.exe
+ciff-clean-frontend/.angular/
+ciff-clean-frontend/node_modules

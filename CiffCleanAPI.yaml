@@ -343,6 +343,11 @@ components:
           type: integer
         fileName:
           type: string
+        uploadDate:
+          type: string
+          format: date-time
+        uploader:
+          $ref: '#/components/schemas/PublicUserDTO'
         comments:
           type: array
           items:
@@ -352,16 +357,13 @@ components:
       properties:
         fileName:
           type: string
-        
     UserRole:
       type: string
       enum:
         - admin
         - regular
-        
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-    
