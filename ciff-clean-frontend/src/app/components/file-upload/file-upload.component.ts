@@ -31,9 +31,9 @@ export class FileUploadComponent {
       file.arrayBuffer().then((arrayBuffer) => {
         const blob = new Blob([new Uint8Array(arrayBuffer)], {type: file.type });
         console.log(blob);
-        this.snackBar.open("Uploaded successfully!", undefined, {
+       /* this.snackBar.open("Uploaded successfully!", undefined, {
           duration: 2000,
-        });
+        });*/
         const user = this.storageService.getUser();
         const uploadedModel: MediaModel = {
           id: 10,
@@ -46,23 +46,23 @@ export class FileUploadComponent {
           event: DialogBoxAction.Confirm,
           data: uploadedModel
         });
-        // this.mediaService.uploadFileForm(blob).subscribe((fileId) => {
-        //   this.snackBar.open("Uploaded successfully!", undefined, {
-        //     duration: 2000,
-        //   });
-        //   const user = this.storageService.getUser();
-        //   const uploadedModel: MediaModel = {
-        //     id: fileId,
-        //     fileName: file.name,
-        //     uploaderName: user?.fullName ?? "",
-        //     uploadDate: new Date(),
-        //     numberOfComments: 0
-        //   }
-        //   this.dialogRef.close({
-        //     event: DialogBoxAction.Confirm,
-        //     data: uploadedModel
-        //   });
-        //   });
+        this.mediaService.uploadFileForm(blob).subscribe((fileId) => {
+          this.snackBar.open("Uploaded successfully!", undefined, {
+            duration: 2000,
+          });
+          const user = this.storageService.getUser();
+          const uploadedModel: MediaModel = {
+            id: fileId,
+            fileName: file.name,
+            uploaderName: user?.fullName ?? "",
+            uploadDate: new Date(),
+            numberOfComments: 0
+          }
+          this.dialogRef.close({
+            event: DialogBoxAction.Confirm,
+            data: uploadedModel
+          });
+          });
       });
     }
   }

@@ -51,22 +51,21 @@ export class DetailsComponent implements OnInit {
     const fileId = +(this.route.snapshot.paramMap.get('id') ?? -1);
 
     console.log(this.file);
-    this.initFile(fileId ?? "");
-    this.initDetails(fileId);
+    //TODO uncomment
+   /* this.initFile(fileId ?? "");
+    this.initDetails(fileId);*/
   }
 
   initFile(id: number): void {
-    //TODO uncomment
-    /*this.mediaService.downloadFile(id).subscribe(data => {
+    this.mediaService.downloadFile(id).subscribe(data => {
           this.media = data;
-        });*/
+        });
   }
 
   initDetails(id: number): void {
-    //TODO uncomment
-    /*this.mediaService.getFiles(id).subscribe(data => {
+    this.mediaService.getMediaById(id).subscribe(data => {
         this.file = data;
-      });*/
+      });
   }
 
   comment() {

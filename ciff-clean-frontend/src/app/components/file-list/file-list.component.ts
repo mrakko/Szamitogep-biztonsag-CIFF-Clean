@@ -3,7 +3,7 @@ import { EditFileDTO, MediaDTO, MediaService, UserRole } from 'src/app/services/
 import { MatDialog } from '@angular/material/dialog';
 import { DialogBoxAction, DialogBoxComponent, DialogBoxData } from '../dialog-box/dialog-box.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import {Component} from "@angular/core";
+import {Component, OnInit} from "@angular/core";
 import {Router} from "@angular/router";
 import { FileUploadComponent } from '../file-upload/file-upload.component';
 
@@ -35,7 +35,7 @@ const TEST_MEDIA_DATA: MediaModel[] = [
   providers: [MediaService]
 })
 
-export class FileListComponent {
+export class FileListComponent implements OnInit{
   public displayedColumns: string[];
   public dataSource = TEST_MEDIA_DATA;
 
@@ -53,7 +53,7 @@ export class FileListComponent {
 
   ngOnInit(): void {
     // TODO: uncomment below upon backend is ready
-    // this.getMediaItems();
+     this.getMediaItems();
   }
 
   getMediaItems() {
