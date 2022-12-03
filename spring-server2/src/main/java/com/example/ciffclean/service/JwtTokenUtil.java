@@ -97,4 +97,10 @@ public class JwtTokenUtil implements Serializable {
     private boolean isExpired(Claims claims) {
         return new Date(System.currentTimeMillis()).after(claims.getExpiration());
     }
+    
+    public Long getUserId(String token){
+        Claims claims = getAllClaimsFromToken(token);
+        return doGetUserId(claims);
+    }
+
 }

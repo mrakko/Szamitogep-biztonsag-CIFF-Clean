@@ -1,6 +1,5 @@
 package com.example.ciffclean.models;
 
-import java.time.LocalDateTime;
 
 public class UserTokenDTO{
     

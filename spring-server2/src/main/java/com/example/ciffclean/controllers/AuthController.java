@@ -1,8 +1,5 @@
 package com.example.ciffclean.controllers;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -66,19 +64,27 @@ public class AuthController {
     }
 
     @PostMapping("changePassword")
-    public ResponseEntity<Boolean> changePassword(@RequestBody ChangeUserPasswordDTO changeUserPasswordDTO){
+    public ResponseEntity<Boolean> changePassword(@RequestBody ChangeUserPasswordDTO changeUserPasswordDTO,
+                            @RequestHeader(value = "Authorization", required = false) String authorization){
         try{
             //TODO: Input validation
-            //TODO: API leírást kiegészíteni. Kell a DTO-ba egy mező, hogy melyik User kéri a változtatást
-            Long userId = Long.valueOf(0);
-            Optional<AppUser> appUser = userRepository.findById(userId);
-            if(!appUser.isPresent()){   return ResponseEntity.status(HttpStatus.NO_CONTENT).build();}
-            if(appUser.get().getEmail().equals(changeUserPasswordDTO.getOldPassword())){ 
-                AppUser changedUser = appUser.get();
-                changedUser.setPassword(changeUserPasswordDTO.getNewPassword());
-                userRepository.save(changedUser);
-                return ResponseEntity.ok(true);
-            } 
+            
+            Optional<String> otoken = jwtTokenUtil.getTokenFromHeader(authorization);
+            if (otoken.isPresent()){
+                String token = otoken.get();
+                Long userId = jwtTokenUtil.getUserId(token);
+                if (jwtTokenUtil.isValidToken(token, userId)) {
+                    Optional<AppUser> appUser = userRepository.findById(userId);
+                    if(!appUser.isPresent()){   return ResponseEntity.status(HttpStatus.NO_CONTENT).build();}
+                    if(appUser.get().getEmail().equals(changeUserPasswordDTO.getOldPassword())){
+                        AppUser changedUser = appUser.get();
+                        changedUser.setPassword(changeUserPasswordDTO.getNewPassword());
+                        userRepository.save(changedUser);
+                        return ResponseEntity.ok(true);
+                    }
+                }
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }                
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }catch (Exception e) {
             e.printStackTrace();
@@ -87,9 +93,10 @@ public class AuthController {
     }
 
     private UserTokenDTO generateUserTokenDTO(AppUser appUser){
+        String token = jwtTokenUtil.generateToken(appUser.getId(), appUser.getFullName());
         UserTokenDTO userTokenDTO = new UserTokenDTO();
         userTokenDTO.setUserId(appUser.getId());
-        userTokenDTO.setToken(jwtTokenUtil.generateToken(appUser.getId(), appUser.getFullName())); 
+        userTokenDTO.setToken(token); 
         return userTokenDTO;
     }
     
