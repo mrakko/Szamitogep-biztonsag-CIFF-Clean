@@ -30,6 +30,6 @@ export class LoginComponent {
   }
 
   login(): void {
-
+    // TODO: save token and userDTO to StorageService
   }
 }

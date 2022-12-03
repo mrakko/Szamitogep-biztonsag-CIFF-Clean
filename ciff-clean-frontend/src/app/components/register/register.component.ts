@@ -39,7 +39,7 @@ export class RegisterComponent {
   }
 
   register(): void {
-
+    // TODO: save token and userDTO to StorageService
   }
 
   getErrorMessage(control: FormControl): string {
