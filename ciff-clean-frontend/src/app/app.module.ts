@@ -26,6 +26,7 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { DialogBoxComponent } from './components/dialog-box/dialog-box.component';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatMenuModule} from "@angular/material/menu";
+import { FileUploadComponent } from './components/file-upload/file-upload.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import {MatMenuModule} from "@angular/material/menu";
     FileListComponent,
     ProfileComponent,
     DetailsComponent,
-    DialogBoxComponent
+    DialogBoxComponent,
+    FileUploadComponent
   ],
     imports: [
         BrowserModule,

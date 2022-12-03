@@ -5,6 +5,7 @@ import { DialogBoxAction, DialogBoxComponent, DialogBoxData } from '../dialog-bo
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {Component} from "@angular/core";
 import {Router} from "@angular/router";
+import { FileUploadComponent } from '../file-upload/file-upload.component';
 
 export interface MediaModel {
   id: number;
@@ -83,6 +84,17 @@ export class FileListComponent {
 
   onUploadClick() {
     console.log('Upload clicked');
+    const dialogRef = this.dialog.open(FileUploadComponent, {
+      width: '310px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.event == DialogBoxAction.Cancel) {
+        return;
+      } else {
+        this.addRowData(result.data);
+      }
+    });
   }
 
   onModifyClick(event: Event, media: MediaModel) {
@@ -126,8 +138,9 @@ export class FileListComponent {
     });
   }
 
-  addRowData(fileName: string){
-    // TODO: upload file, create new MediaModel and push to dataSource
+  addRowData(newMedia: MediaModel){
+    this.models.push(newMedia);
+    this.dataSource = this.models
   }
 
   updateRowData(data: DialogBoxData) {
@@ -149,6 +162,7 @@ export class FileListComponent {
         }
         return true;
       });
+      this.models = this.dataSource;
     });
   }
 
@@ -162,6 +176,7 @@ export class FileListComponent {
         this.dataSource = this.dataSource.filter((value) => {
           return value.id != id;
         });
+        this.models = this.dataSource;
       });
   }
 }

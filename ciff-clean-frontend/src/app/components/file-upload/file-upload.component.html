@@ -1,0 +1,11 @@
+<h3 mat-dialog-title>Choose a CAFF File</h3>
+<div mat-dialog-content>
+    <input type="file"
+    accept=".caff"
+    id="file"
+    (change)="handleFileInput($event)">
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="upload()" mat-flat-button color="warn"> Upload </button>
+  <button mat-button (click)="closeDialog()" mat-stroked-button>Cancel</button>
+</div>
