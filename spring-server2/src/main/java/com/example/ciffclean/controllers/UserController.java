@@ -34,17 +34,18 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<UserDTO> getUser(@RequestHeader(value = "Authorization") String authorization){
+        Long currentUserId = -1L;
         try {
-            Long currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
+            currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
             logService.logActivity(currentUserId, "GETUSER", null);
             var res = userService.getUser(currentUserId);
             return ResponseEntity.ok(res);
         } catch (NoSuchElementException e) {
-            logService.logError("UNAUTHORIZED", "GETUSER");
+            logService.logError(currentUserId, "UNAUTHORIZED", "GETUSER");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
-            logService.logError(e.getMessage(), "GETUSER");
+            logService.logError(currentUserId, e.getMessage(), "GETUSER");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -52,18 +53,20 @@ public class UserController {
     @PutMapping
     public ResponseEntity<UserDTO> editUser(@RequestBody EditUserDTO editUserDTO,
         @RequestHeader(value = "Authorization") String authorization){
+
+        Long currentUserId = -1L;
         try {
-            Long currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
+            currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
             logService.logActivity(currentUserId, "EDITUSER START", null);
             var res = userService.editUser(editUserDTO, currentUserId);
             logService.logActivity(currentUserId, "EDITUSER OK", null);
             return ResponseEntity.ok(res);
         } catch (NoSuchElementException e) {
-            logService.logError("UNAUTHORIZED", "EDITUSER");
+            logService.logError(currentUserId, "UNAUTHORIZED", "EDITUSER");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
-            logService.logError(e.getMessage(), "EDITUSER");
+            logService.logError(currentUserId, e.getMessage(), "EDITUSER");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

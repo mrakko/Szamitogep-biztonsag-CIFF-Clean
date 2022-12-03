@@ -60,11 +60,11 @@ public class MediaController {
                     logService.logActivity(currentUserId, "COMMENT", null);
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
                 }
-                logService.logError("UNAUTHORIZED", "COMMENT");
+                logService.logError(currentUserId, "UNAUTHORIZED", "COMMENT");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }  catch (Exception e) {
                 e.printStackTrace();
-                logService.logError(e.getMessage(), "COMMENT");
+                logService.logError(currentUserId, e.getMessage(), "COMMENT");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
     }
@@ -85,14 +85,14 @@ public class MediaController {
                 logService.logActivity(currentUserId, "COMMENT", null);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-            logService.logError("UNAUTHORIZED", "DELETE");
+            logService.logError(currentUserId, "UNAUTHORIZED", "DELETE");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (IllegalArgumentException e) {
-            logService.logError(jwtTokenUtil.getCurrentUserId(authorization).toString() + " IS NOT ADMIN", "DELETE");
+            logService.logError(currentUserId, currentUserId.toString() + " IS NOT ADMIN", "DELETE");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
             e.printStackTrace();
-            logService.logError(e.getMessage(), "DELETE");
+            logService.logError(currentUserId, e.getMessage(), "DELETE");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -112,11 +112,11 @@ public class MediaController {
                 logService.logActivity(currentUserId, "DOWNLOAD", null);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-            logService.logError("UNAUTHORIZED", "DOWNLOAD");
+            logService.logError(currentUserId, "UNAUTHORIZED", "DOWNLOAD");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
-            logService.logError(e.getMessage(), "DOWNLOAD");
+            logService.logError(currentUserId, e.getMessage(), "DOWNLOAD");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -135,11 +135,11 @@ public class MediaController {
             }
             return ResponseEntity.ok().body(dtos);
         } catch (NoSuchElementException e) {
-            logService.logError("UNAUTHORIZED", "GETALLFILES");
+            logService.logError(currentUserId, "UNAUTHORIZED", "GETALLFILES");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
-            logService.logError(e.getMessage(), "GETALLFILES");
+            logService.logError(currentUserId, e.getMessage(), "GETALLFILES");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -156,11 +156,11 @@ public class MediaController {
             var res = mediaService.getGif(id).toMediaDTO();
             return ResponseEntity.ok(res);
         } catch (NoSuchElementException e) {
-            logService.logError("UNAUTHORIZED", "GETFILEBYID");
+            logService.logError(currentUserId, "UNAUTHORIZED", "GETFILEBYID");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
-            logService.logError(e.getMessage(), "GETFILEBYID");
+            logService.logError(currentUserId, e.getMessage(), "GETFILEBYID");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -182,11 +182,11 @@ public class MediaController {
             }
             return ResponseEntity.ok().body(dtos);
         } catch (NoSuchElementException e) {
-            logService.logError("UNAUTHORIZED", "SEARCH");
+            logService.logError(currentUserId, "UNAUTHORIZED", "SEARCH");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
-            logService.logError(e.getMessage(), "SEARCH");
+            logService.logError(currentUserId, e.getMessage(), "SEARCH");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -210,11 +210,11 @@ public class MediaController {
                 logService.logActivity(currentUserId, "DOWNLOAD", null);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-            logService.logError("UNAUTHORIZED", "MODIFYFILE");
+            logService.logError(currentUserId, "UNAUTHORIZED", "MODIFYFILE");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
-            logService.logError(e.getMessage(), "MODIFYFILE");
+            logService.logError(currentUserId, e.getMessage(), "MODIFYFILE");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -232,17 +232,17 @@ public class MediaController {
             byte[] content = IOUtils.toByteArray(file.getInputStream());
             Long id = mediaService.addCaff(content, file.getName(), currentUserId);
             if (id == -1L){
-                logService.logError(currentUserId + " CANNOT UPLOAD", "UPLOAD");
+                logService.logError(currentUserId, "CANNOT UPLOAD", "UPLOAD");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
             logService.logActivity(currentUserId, "UPLOAD DONE", id);
             return ResponseEntity.ok().body(id);
         } catch (NoSuchElementException e) {
-            logService.logError("UNAUTHORIZED", "UPLOAD");
+            logService.logError(currentUserId, "UNAUTHORIZED", "UPLOAD");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
-            logService.logError(e.getMessage(), "UPLOAD");
+            logService.logError(currentUserId, e.getMessage(), "UPLOAD");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
