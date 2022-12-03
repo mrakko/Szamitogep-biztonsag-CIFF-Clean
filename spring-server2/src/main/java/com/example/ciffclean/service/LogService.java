@@ -2,17 +2,36 @@ package com.example.ciffclean.service;
 
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.example.ciffclean.domain.Log;
+import com.example.ciffclean.repositories.LogRepository;
 
 @Component
 public class LogService {
-    public void logActivity(Long userId, String activity, Long gifId){
-        var date =  new Date();
-        // TODO log
+
+    @Autowired
+    private LogRepository logRepository;
+
+    public Long logActivity(Long userId, String activity, Long gifId){
+        return log(userId, activity, gifId, true, "");
     }
 
 
-    public void logError(String cause, String function){
-        // TODO log
+    public Long logError(Long userId, String cause, String function){
+        return log(userId, function, null, false, cause);
+    }
+
+    private Long log(Long userId, String activity, Long gifId, boolean success, String details){
+        Log log = new Log();
+        log.setUserId(userId);
+        log.setActivity(activity);
+        log.setRelatedFileId(gifId);
+        log.setSucceeded(success);
+        log.setDetails(details);
+        log.setDate(new Date());
+        logRepository.save(log);
+        return log.getId();
     }
 }

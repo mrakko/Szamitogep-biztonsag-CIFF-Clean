@@ -40,8 +40,8 @@ public class AuthController {
             appUser.setEmail(createUserDTO.getEmail());
             appUser.setPassword(createUserDTO.getPassword());   //TODO: Plaintext helyett cizelláltabban...
             appUser.setFullName(createUserDTO.getFullName());
-            AppUser savedUser = userRepository.save(appUser);
-            return ResponseEntity.ok(generateUserTokenDTO(savedUser));
+            userRepository.save(appUser);
+            return ResponseEntity.ok(generateUserTokenDTO(appUser));
 
         }catch (Exception e) {
             e.printStackTrace();
