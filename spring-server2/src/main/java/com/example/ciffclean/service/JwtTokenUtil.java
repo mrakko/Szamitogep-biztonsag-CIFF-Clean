@@ -18,7 +18,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public class JwtTokenUtil implements Serializable {
     
     @Value("${jwt.secret}")
-    private String secret;
+    private String secret = "Secret";
     
     private final int tokenExpiryTime = 10 * 60 * 60 * 1000; //10 perc
 

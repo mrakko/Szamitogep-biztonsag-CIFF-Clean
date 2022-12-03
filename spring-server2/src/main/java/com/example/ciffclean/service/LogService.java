@@ -2,6 +2,9 @@ package com.example.ciffclean.service;
 
 import java.util.Date;
 
+import org.springframework.stereotype.Service;
+
+@Service
 public class LogService {
     public void logActivity(Long userId, String activity, Long gifId){
         var date =  new Date();
