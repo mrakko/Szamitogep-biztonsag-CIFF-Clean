@@ -57,19 +57,17 @@ export class RegisterComponent {
       password: this.passwordControl.value
     };
 
-    this.authService.registerUser(user).pipe(catchError((error, caught) => {
-      //TODO error status
-      if (error instanceof HttpErrorResponse) {
-        this.errorMessage = "Incorrect email or password";
-      }
-      return caught;
-    })).subscribe((userToken) => {
-        this.storageService.saveToken(userToken.value ?? "");
+    this.authService.registerUser(user).subscribe((userToken) => {
+        this.storageService.saveToken(userToken.token ?? "");
         this.userService.getUser().subscribe((user) => {
           this.storageService.saveUser(user);
           this.router.navigate(["file-list"]);
         })
-      },
+      }, (error) => {
+        if (error instanceof HttpErrorResponse) {
+          this.errorMessage = "Incorrect email or password";
+        }
+      }
     );
   }
 

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {getErrorMessageUtil} from "../../util/validators";
 import {AuthService, CreateUserDTO, LoginUserDTO, UserService} from "../../services/networking";
@@ -26,11 +26,11 @@ export class LoginComponent {
               private userService: UserService) {
   }
 
-  get emailControl(): FormControl{
+  get emailControl(): FormControl {
     return <FormControl<any>>this.loginForm.get('email');
   }
 
-  get passwordControl(): FormControl{
+  get passwordControl(): FormControl {
     return <FormControl<any>>this.loginForm.get('password');
   }
 
@@ -44,18 +44,16 @@ export class LoginComponent {
       password: this.passwordControl.value
     };
 
-    this.authService.loginUser(user).pipe(catchError((error, caught) => {
-      //TODO error status
-      if (error instanceof HttpErrorResponse) {
-        this.errorMessage = "Incorrect email or password";
-      }
-      return caught;
-    })).subscribe((userToken) => {
-      this.storageService.saveToken(userToken.value ?? "");
+    this.authService.loginUser(user).subscribe((userToken) => {
+      this.storageService.saveToken(userToken.token ?? "");
       this.userService.getUser().subscribe((user) => {
         this.storageService.saveUser(user);
         this.router.navigate(["file-list"]);
       })
+    }, (error) => {
+      if (error instanceof HttpErrorResponse) {
+        this.errorMessage = "Incorrect email or password";
+      }
     })
   }
 }

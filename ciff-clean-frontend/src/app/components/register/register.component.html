@@ -30,12 +30,12 @@
 
       <mat-form-field appearance="fill" class="field">
         <mat-label>Full name</mat-label>
-        <input matInput placeholder="adam@example.com" [formControl]="fullNameControl">
+        <input matInput [formControl]="fullNameControl">
         <mat-error *ngIf="fullNameControl.invalid">{{getErrorMessage(fullNameControl)}}</mat-error>
       </mat-form-field>
       <mat-form-field appearance="fill" class="field">
         <mat-label>Address</mat-label>
-        <input matInput placeholder="adam@example.com" [formControl]="addressControl">
+        <input matInput [formControl]="addressControl">
         <mat-error *ngIf="addressControl.invalid">{{getErrorMessage(addressControl)}}</mat-error>
       </mat-form-field>
     </div>

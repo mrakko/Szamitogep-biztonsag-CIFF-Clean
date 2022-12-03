@@ -17,7 +17,7 @@ import { MainLayoutComponent } from './components/main-layout/main-layout.compon
 import { FileListComponent } from './components/file-list/file-list.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { DetailsComponent } from './components/details/details.component';
-import { MatTableModule } from '@angular/material/table'  
+import { MatTableModule } from '@angular/material/table'
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './services/authentication/auth.interceptor';
 import { AuthGuard } from './guards/auth.guard';
@@ -25,6 +25,7 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DialogBoxComponent } from './components/dialog-box/dialog-box.component';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import {MatMenuModule} from "@angular/material/menu";
 
 @NgModule({
   declarations: [
@@ -53,14 +54,15 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
         MatRippleModule,
         MatDialogModule,
         FormsModule,
-        MatSnackBarModule
+        MatSnackBarModule,
+        MatMenuModule
     ],
   providers: [
     AuthGuard,
-    { 
-      provide: HTTP_INTERCEPTORS, 
-      useClass: AuthInterceptor, 
-      multi: true 
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
     }
   ],
   bootstrap: [AppComponent]

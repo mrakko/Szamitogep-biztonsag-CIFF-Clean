@@ -20,7 +20,7 @@ import {StorageService} from "../../services/authentication/storage.service";
   styleUrls: ['./profile.component.scss'],
   providers: [AuthService, UserService]
 })
-export class ProfileComponent implements OnInit{
+export class ProfileComponent implements OnInit {
   profileForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     fullName: new FormControl('', [Validators.required]),
@@ -81,18 +81,13 @@ export class ProfileComponent implements OnInit{
       address: this.addressControl.value
     }
 
-/*    this.userService.editUser(user).pipe(catchError((error, caught) => {
-      //TODO error status
-      if (error instanceof HttpErrorResponse) {
-        //this.errorMessage = "Incorrect email or password";
-      }
-      return caught;
-    })).subscribe(() => {
-      this.snackBar.open('User edited successfully', undefined, {
-        duration: 2000,
-      });
+    this.userService.editUser(user).subscribe((newUser) => {
+      this.storageService.saveUser(newUser);
+        this.snackBar.open('User edited successfully', undefined, {
+          duration: 2000,
+        });
       },
-    );*/
+    );
   }
 
   changePass(): void {
@@ -102,17 +97,11 @@ export class ProfileComponent implements OnInit{
     };
 
     //TODO uncomment
-  /*  this.authService.changePassword(pass).pipe(catchError((error, caught) => {
-      //TODO error status
-      if (error instanceof HttpErrorResponse) {
-        //this.errorMessage = "Incorrect email or password";
-      }
-      return caught;
-    })).subscribe((userToken) => {
-this.snackBar.open('Password changed successfully', undefined, {
-      duration: 2000,
-    });
+    this.authService.changePassword(pass).subscribe((userToken) => {
+        this.snackBar.open('Password changed successfully', undefined, {
+          duration: 2000,
+        });
       },
-    );*/
+    );
   }
 }
