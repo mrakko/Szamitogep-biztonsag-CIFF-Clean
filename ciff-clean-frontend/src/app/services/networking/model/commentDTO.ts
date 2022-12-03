@@ -12,7 +12,7 @@
 import { PublicUserDTO } from './publicUserDTO';
 
 export interface CommentDTO { 
-    id?: number;
-    text?: string;
-    commenter?: PublicUserDTO;
+    id: number;
+    text: string;
+    commenter: PublicUserDTO;
 }

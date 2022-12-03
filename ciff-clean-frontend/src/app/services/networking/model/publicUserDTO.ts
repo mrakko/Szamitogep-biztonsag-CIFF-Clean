@@ -15,8 +15,8 @@ import { UserRole } from './userRole';
  * Publicly available infos of the user (used for identifying commenter)
  */
 export interface PublicUserDTO { 
-    id?: number;
-    role?: UserRole;
-    fullName?: string;
+    id: number;
+    role: UserRole;
+    fullName: string;
     profileImage?: string;
 }

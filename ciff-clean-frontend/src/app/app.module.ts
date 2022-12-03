@@ -4,7 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
-import {ReactiveFormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {MatButtonModule} from "@angular/material/button";
@@ -23,6 +23,7 @@ import { AuthInterceptor } from './services/authentication/auth.interceptor';
 import { AuthGuard } from './guards/auth.guard';
 import { MatRippleModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
+import { DialogBoxComponent } from './components/dialog-box/dialog-box.component';
 
 @NgModule({
   declarations: [
@@ -33,7 +34,8 @@ import { MatDialogModule } from '@angular/material/dialog';
     MainLayoutComponent,
     FileListComponent,
     ProfileComponent,
-    DetailsComponent
+    DetailsComponent,
+    DialogBoxComponent
   ],
     imports: [
         BrowserModule,
@@ -48,7 +50,8 @@ import { MatDialogModule } from '@angular/material/dialog';
         MatTableModule,
         HttpClientModule,
         MatRippleModule,
-        MatDialogModule
+        MatDialogModule,
+        FormsModule
     ],
   providers: [
     AuthGuard,
