@@ -145,13 +145,13 @@ paths:
             schema:
               $ref: '#/components/schemas/EditFileDTO'
         required: true
-      parameters: 
-      - name: id
-        in: path
-        required: true
-        description: ID of the media file
-        schema:
-          type: integer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the media file
+          schema:
+            type: integer
       responses:
         '200':
           description: Ok
@@ -168,13 +168,13 @@ paths:
       responses:
         '204':
           description: No content
-      parameters: 
-      - name: id
-        in: path
-        required: true
-        description: ID of the media file
-        schema:
-          type: integer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the media file
+          schema:
+            type: integer
   /media/{id}/download:
     get:
       tags:
@@ -190,13 +190,13 @@ paths:
                 type: string
                 format: binary
                 nullable: false
-      parameters: 
-      - name: id
-        in: path
-        required: true
-        description: ID of the file
-        schema:
-          type: integer
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the file
+          schema:
+            type: integer
   /media/search:
     get:
       tags:
@@ -212,7 +212,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaDTO'
-      parameters: 
+      parameters:
         - name: query
           in: query
           description: Name of the file
@@ -237,6 +237,9 @@ paths:
 components:
   schemas:
     LoginUserDTO:
+      required:
+        - email
+        - password
       type: object
       properties:
         email:
@@ -265,6 +268,8 @@ components:
           type: string
           format: binary
     UserTokenDTO:
+      required:
+        - value
       type: object
       properties:
         value:
@@ -289,6 +294,10 @@ components:
         fileId:
           type: integer
     CommentDTO:
+      required:
+        - id
+        - text
+        - commenter
       type: object
       properties:
         id:
@@ -307,11 +316,17 @@ components:
         address:
           type: string
     UserDTO:
+      required:
+        - id
+        - role
+        - fullName
+        - address
+        - email
       type: object
       properties:
         id:
           type: integer
-        role:  
+        role:
           $ref: '#/components/schemas/UserRole'
         fullName:
           type: string
@@ -325,11 +340,15 @@ components:
           format: byte
     PublicUserDTO:
       description: Publicly available infos of the user (used for identifying commenter)
+      required:
+        - id
+        - role
+        - fullName
       type: object
       properties:
         id:
           type: integer
-        role:  
+        role:
           $ref: '#/components/schemas/UserRole'
         fullName:
           type: string
@@ -337,6 +356,12 @@ components:
           type: string
           format: byte
     MediaDTO:
+      required:
+        - fileId
+        - fileName
+        - uploadDate
+        - uploader
+        - comments
       type: object
       properties:
         fileId:
