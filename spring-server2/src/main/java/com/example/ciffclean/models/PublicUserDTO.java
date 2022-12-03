@@ -42,4 +42,5 @@ public class PublicUserDTO   {
   public void setProfileImage(byte[] profileImage) {
     this.profileImage = profileImage;
   }
+
 }

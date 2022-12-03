@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -99,7 +100,11 @@ public class MediaService {
         gifFile.setName(name);
         gifFile.setContent(gifContent);
         gifFile.setCaff(content);
-        gifFile.setUserId(userId);
+        if(userId != null){
+            var user = userRepository.findById(userId).get();
+            gifFile.setUser(user);
+        }
+        gifFile.setUploadDate(new Date());
         gifFileRepository.save(gifFile);
         return gifFile.getId();
     }
@@ -111,7 +116,6 @@ public class MediaService {
             throw new IllegalArgumentException();
         }
         AppUser currentUser = result.get();
-        // TODO findById vagy findByIdWithComments kell?
         var file = gifFileRepository.findById(body.getFileId());
         if(file.isEmpty()){
             throw new NoSuchElementException(FILE_NOT_FOUND);
@@ -124,6 +128,14 @@ public class MediaService {
 
         file.get().addComment(saved);
         return saved.getId();
+    }
+
+    public GifFile getGif(Long id){
+        var res = gifFileRepository.findById(id);
+        if(res.isEmpty()){
+            throw new NoSuchElementException(FILE_NOT_FOUND);
+        }
+        return res.get();
     }
     
     @Transactional
@@ -156,7 +168,7 @@ public class MediaService {
         if(file.isEmpty()){
             throw new NoSuchElementException(FILE_NOT_FOUND);
         }
-        return file.get().getCaff();
+        return file.get().getContent();
     }
 
 }
