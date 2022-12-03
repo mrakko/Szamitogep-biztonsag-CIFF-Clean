@@ -18,7 +18,7 @@ import { FileListComponent } from './components/file-list/file-list.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { DetailsComponent } from './components/details/details.component';
 import { MatTableModule } from '@angular/material/table'  
-import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './services/authentication/auth.interceptor';
 import { AuthGuard } from './guards/auth.guard';
 
@@ -43,7 +43,8 @@ import { AuthGuard } from './guards/auth.guard';
         MatButtonModule,
         MatIconModule,
         MatToolbarModule,
-        MatTableModule
+        MatTableModule,
+        HttpClientModule
     ],
   providers: [
     AuthGuard,

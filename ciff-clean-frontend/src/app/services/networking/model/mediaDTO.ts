@@ -10,9 +10,12 @@
  * Do not edit the class manually.
  */
 import { CommentDTO } from './commentDTO';
+import { PublicUserDTO } from './publicUserDTO';
 
 export interface MediaDTO { 
     fileId?: number;
     fileName?: string;
+    uploadDate?: Date;
+    uploader?: PublicUserDTO;
     comments?: Array<CommentDTO>;
 }

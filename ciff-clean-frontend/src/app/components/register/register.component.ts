@@ -61,6 +61,6 @@ export class RegisterComponent {
   }
 
   register(): void {
-    // TODO: save token and userDTO to TokenStorageService
+    // TODO: save token and userDTO to StorageService
   }
 }
