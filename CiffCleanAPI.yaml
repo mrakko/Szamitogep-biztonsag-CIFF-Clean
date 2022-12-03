@@ -6,7 +6,7 @@ externalDocs:
   description: Source code - Github
   url: https://github.com/mrakko/Szamitogep-biztonsag-CIFF-Clean
 servers:
-  - url: https://petstore3.swagger.io/api/v3
+  - url: http://localhost:8080
 security:
   - bearerAuth: []
 paths:
@@ -117,7 +117,7 @@ paths:
           content:
             text/plain:
               schema:
-                type: string
+                type: integer
   /media:
     get:
       tags:
@@ -133,6 +133,28 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/MediaDTO'
+  /media/{id}:
+    get:
+      tags:
+        - media
+      operationId: getMediaById
+      summary: Get media info by Id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID of the media file
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MediaDTO'
+        '400':
+          description: error
   /media/{id}/modify:
     put:
       tags:
@@ -269,14 +291,12 @@ components:
           format: binary
     UserTokenDTO:
       required:
-        - value
+        - userId
+        - token
       type: object
       properties:
-        value:
+        token:
           type: string
-        expirationDate:
-          type: string
-          format: date-time
         userId:
           type: integer
     ChangeUserPasswordDTO:
