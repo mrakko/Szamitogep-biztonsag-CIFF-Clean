@@ -15,7 +15,7 @@ const routes: Routes = [
   {
     path: '', component: MainLayoutComponent, children: [
       { path: 'file-list', component: FileListComponent, canActivate: [AuthGuard] },
-      { path: 'details/:name', component: DetailsComponent, canActivate: [AuthGuard] },
+      { path: 'details/:id', component: DetailsComponent, canActivate: [AuthGuard] },
       { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
     ]
   }

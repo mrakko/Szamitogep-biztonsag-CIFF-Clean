@@ -1,11 +1,17 @@
 import { Component } from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {getErrorMessageUtil} from "../../util/validators";
+import {AuthService, CreateUserDTO, LoginUserDTO} from "../../services/networking";
+import {StorageService} from "../../services/authentication/storage.service";
+import {Router} from "@angular/router";
+import {HttpErrorResponse} from "@angular/common/http";
+import {catchError} from "rxjs/operators";
 
 @Component({
   selector: 'ciff-clean-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./login.component.scss'],
+  providers: [AuthService]
 })
 export class LoginComponent {
   loginForm = new FormGroup({
@@ -13,8 +19,9 @@ export class LoginComponent {
     password: new FormControl('', [Validators.required])
   });
   hidePassword = true;
+  errorMessage: string | null = null;
 
-  constructor() {
+  constructor(private authService: AuthService, private storageService: StorageService, private router: Router) {
   }
 
   get emailControl(): FormControl{
@@ -30,6 +37,22 @@ export class LoginComponent {
   }
 
   login(): void {
-    // TODO: save token and userDTO to StorageService
+    const user: LoginUserDTO = {
+      email: this.emailControl.value,
+      password: this.passwordControl.value
+    };
+
+    // TODO: save userDTO to StorageService
+    this.authService.loginUser(user).pipe(catchError((error, caught) => {
+      //TODO error status
+      if (error instanceof HttpErrorResponse) {
+        this.errorMessage = "Incorrect email or password";
+      }
+
+      return caught;
+    })).subscribe((userToken) => {
+      this.storageService.saveToken(userToken.value ?? "");
+      this.router.navigate(["file-list"]);
+    })
   }
 }

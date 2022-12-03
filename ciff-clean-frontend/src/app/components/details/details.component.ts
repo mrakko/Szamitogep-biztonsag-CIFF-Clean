@@ -1,5 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from "@angular/router";
+import {MediaModel} from "../file-list/file-list.component";
+import {MediaService} from "../../services/networking";
 
 @Component({
   selector: 'ciff-clean-details',
@@ -7,10 +9,18 @@ import {ActivatedRoute} from "@angular/router";
   styleUrls: ['./details.component.scss']
 })
 export class DetailsComponent implements OnInit {
-  constructor(private route: ActivatedRoute) {
+  file: MediaModel = {}
+  constructor(private route: ActivatedRoute, private mediaService: MediaService) {
   }
 
   ngOnInit(): void {
-    const fileName = this.route.snapshot.paramMap.get('name');
+    const fileId = +(this.route.snapshot.paramMap.get('id') ?? -1);
+    this.file = history.state;
+    console.log(this.file);
+    this.initFile(fileId ?? "");
+  }
+
+  initFile(id: number): void {
+    this.mediaService.downloadFile(id).subscribe()
   }
 }

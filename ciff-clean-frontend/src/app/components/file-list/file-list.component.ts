@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
-import { StorageService } from 'src/app/services/authentication/storage.service';
-import { MediaDTO, MediaService, UserRole } from 'src/app/services/networking';
+import {Router} from "@angular/router";
+import {MediaDTO, MediaService, UserRole} from "../../services/networking";
+import {StorageService} from "../../services/authentication/storage.service";
 
-export interface MediaModel { 
+export interface MediaModel {
   id?: number;
   fileName?: string;
   uploaderName?: string;
@@ -32,7 +33,7 @@ export class FileListComponent {
   filteredModels: MediaModel[] = new Array<MediaModel>();
   isAdmin: boolean;
 
-  constructor(private mediaService: MediaService, private storageService: StorageService) {
+  constructor(private mediaService: MediaService, private storageService: StorageService, private router: Router) {
     this.isAdmin = storageService.getUser()?.role === UserRole.Admin;
     this.isAdmin = true;
     this.displayedColumns = this.isAdmin ? ['name', 'uploaderName', 'uploadDate', 'modify', 'delete'] : ['name', 'uploaderName', 'uploadDate'];
@@ -60,6 +61,7 @@ export class FileListComponent {
 
   onRowClicked(row: MediaModel) {
     console.log('Row clicked: ', row);
+    this.router.navigate(['details', row.id], {state: row});
   }
 
   applyFilter(event: Event) {
