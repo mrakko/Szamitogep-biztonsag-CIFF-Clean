@@ -365,9 +365,9 @@ export class MediaService {
      * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
      * @param reportProgress flag to report request and response progress.
      */
-    public uploadFileForm(file: Blob, observe?: 'body', reportProgress?: boolean): Observable<string>;
-    public uploadFileForm(file: Blob, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<string>>;
-    public uploadFileForm(file: Blob, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<string>>;
+    public uploadFileForm(file: Blob, observe?: 'body', reportProgress?: boolean): Observable<number>;
+    public uploadFileForm(file: Blob, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<number>>;
+    public uploadFileForm(file: Blob, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<number>>;
     public uploadFileForm(file: Blob, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
 
         if (file === null || file === undefined) {
@@ -415,7 +415,7 @@ export class MediaService {
             formParams = formParams.append('file', <any>file) as any || formParams;
         }
 
-        return this.httpClient.request<string>('post',`${this.basePath}/media/upload`,
+        return this.httpClient.request<number>('post',`${this.basePath}/media/upload`,
             {
                 body: convertFormParamsToString ? formParams.toString() : formParams,
                 withCredentials: this.configuration.withCredentials,

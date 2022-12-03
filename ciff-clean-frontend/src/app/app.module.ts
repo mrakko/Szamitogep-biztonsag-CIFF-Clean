@@ -25,6 +25,7 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DialogBoxComponent } from './components/dialog-box/dialog-box.component';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { FileUploadComponent } from './components/file-upload/file-upload.component';
 
 @NgModule({
   declarations: [
@@ -36,7 +37,8 @@ import {MatSnackBarModule} from '@angular/material/snack-bar';
     FileListComponent,
     ProfileComponent,
     DetailsComponent,
-    DialogBoxComponent
+    DialogBoxComponent,
+    FileUploadComponent
   ],
     imports: [
         BrowserModule,
