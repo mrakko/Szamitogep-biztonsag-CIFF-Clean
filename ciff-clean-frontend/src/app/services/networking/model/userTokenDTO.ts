@@ -11,7 +11,7 @@
  */
 
 export interface UserTokenDTO { 
-    value?: string;
+    value: string;
     expirationDate?: Date;
     userId?: number;
 }

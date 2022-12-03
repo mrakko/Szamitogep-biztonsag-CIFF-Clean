@@ -12,10 +12,10 @@
 import { UserRole } from './userRole';
 
 export interface UserDTO { 
-    id?: number;
-    role?: UserRole;
-    fullName?: string;
-    address?: string;
-    email?: string;
+    id: number;
+    role: UserRole;
+    fullName: string;
+    address: string;
+    email: string;
     profileImage?: string;
 }

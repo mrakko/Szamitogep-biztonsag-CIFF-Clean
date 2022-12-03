@@ -1,21 +1,30 @@
-import { Component } from '@angular/core';
+import { StorageService } from 'src/app/services/authentication/storage.service';
+import { EditFileDTO, MediaDTO, MediaService, UserRole } from 'src/app/services/networking';
+import { MatDialog } from '@angular/material/dialog';
+import { DialogBoxAction, DialogBoxComponent, DialogBoxData } from '../dialog-box/dialog-box.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import {Component} from "@angular/core";
 import {Router} from "@angular/router";
-import {MediaDTO, MediaService, UserRole} from "../../services/networking";
-import {StorageService} from "../../services/authentication/storage.service";
 
 export interface MediaModel {
-  id?: number;
-  fileName?: string;
-  uploaderName?: string;
-  uploadDate?: Date;
+  id: number;
+  fileName: string;
+  uploaderName: string;
+  uploadDate: Date;
+  numberOfComments: number;
+}
+
+export enum OpenDialogReason {
+  Delete,
+  Modify
 }
 
 const TEST_MEDIA_DATA: MediaModel[] = [
-  {id: 0, fileName: 'Hydrogen', uploaderName: 'H', uploadDate: new Date()},
-  {id: 1, fileName: 'Helium', uploaderName: 'A', uploadDate: new Date()},
-  {id: 2, fileName: 'Nice', uploaderName: 'D', uploadDate: new Date()},
-  {id: 3, fileName: 'WOW', uploaderName: 'R', uploadDate: new Date()},
-  {id: 4, fileName: 'Funk', uploaderName: 'X', uploadDate: new Date()}
+  {id: 0, fileName: 'Hydrogen', uploaderName: 'H', uploadDate: new Date(), numberOfComments: 2},
+  {id: 1, fileName: 'Helium', uploaderName: 'A', uploadDate: new Date(), numberOfComments: 4},
+  {id: 2, fileName: 'Nice', uploaderName: 'D', uploadDate: new Date(), numberOfComments: 12},
+  {id: 3, fileName: 'WOW', uploaderName: 'R', uploadDate: new Date(), numberOfComments: 0},
+  {id: 4, fileName: 'Funk', uploaderName: 'X', uploadDate: new Date(), numberOfComments: 0}
 ];
 
 @Component({
@@ -33,10 +42,12 @@ export class FileListComponent {
   filteredModels: MediaModel[] = new Array<MediaModel>();
   isAdmin: boolean;
 
-  constructor(private mediaService: MediaService, private storageService: StorageService, private router: Router) {
+  constructor(public dialog: MatDialog, private mediaService: MediaService, private storageService: StorageService, private snackBar: MatSnackBar,
+              private router: Router) {
+
     this.isAdmin = storageService.getUser()?.role === UserRole.Admin;
     this.isAdmin = true;
-    this.displayedColumns = this.isAdmin ? ['name', 'uploaderName', 'uploadDate', 'modify', 'delete'] : ['name', 'uploaderName', 'uploadDate'];
+    this.displayedColumns = this.isAdmin ? ['name', 'uploaderName', 'uploadDate', 'numberOfComments', 'modify', 'delete'] : ['name', 'uploaderName', 'uploadDate', 'numberOfComments'];
   }
 
   ngOnInit(): void {
@@ -51,8 +62,9 @@ export class FileListComponent {
           return {
             id: item.fileId,
             fileName: item.fileName,
-            uploaderName: item.uploader?.fullName,
-            uploadDate: item.uploadDate
+            uploaderName: item.uploader.fullName,
+            uploadDate: item.uploadDate,
+            numberOfComments: item.comments.length
           }
         });
         this.dataSource = this.models;
@@ -73,15 +85,83 @@ export class FileListComponent {
     console.log('Upload clicked');
   }
 
-  onModifyClick(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    console.log('Modify clicked ', value);
+  onModifyClick(event: Event, media: MediaModel) {
     event.stopPropagation();
+    console.log('Modify clicked ', media);
+    this.openDialog(OpenDialogReason.Modify, media);
   }
 
-  onDeleteClick(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    console.log('Delete clicked ', value);
+  onDeleteClick(event: Event, media: MediaModel) {
     event.stopPropagation();
+    console.log('Delete clicked ', media);
+    this.openDialog(OpenDialogReason.Delete, media);
+  }
+
+  openDialog(reason: OpenDialogReason, media: MediaModel) {
+    const dialogData: DialogBoxData = {
+      id: media.id,
+      dialogTitle: reason == OpenDialogReason.Modify ? "Edit name of the file" : "Are you sure to delete?",
+      confirmButtonTitle: reason == OpenDialogReason.Modify ? "Confirm" : "Delete",
+      inputFieldText: (reason == OpenDialogReason.Modify ? media.fileName : undefined)
+    };
+    const dialogRef = this.dialog.open(DialogBoxComponent, {
+      width: '260px',
+      data: dialogData
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result.event == DialogBoxAction.Cancel) {
+        return;
+      }
+      switch (reason) {
+        case OpenDialogReason.Modify:
+          this.updateRowData(result.data);
+          break;
+        case OpenDialogReason.Delete:
+          this.deleteRowData(result.data.id);
+          break;
+        default:
+          break;
+      }
+    });
+  }
+
+  addRowData(fileName: string){
+    // TODO: upload file, create new MediaModel and push to dataSource
+  }
+
+  updateRowData(data: DialogBoxData) {
+    if (!data.inputFieldText) {
+      return;
+    }
+    console.log(data);
+    const editDTO: EditFileDTO = {
+      fileName: data.inputFieldText
+    };
+    this.mediaService.modifyFile(editDTO, data.id)
+    .subscribe(() => {
+      this.snackBar.open("Modified successfully!", undefined, {
+        duration: 2000,
+      });
+      this.dataSource = this.dataSource.filter((value) => {
+        if (value.id == data.id && data.inputFieldText) {
+          value.fileName = data.inputFieldText;
+        }
+        return true;
+      });
+    });
+  }
+
+  deleteRowData(id: number) {
+    console.log(id);
+    this.mediaService.deleteFile(id)
+      .subscribe(() => {
+        this.snackBar.open("Deleted successfully!", undefined, {
+          duration: 2000,
+        });
+        this.dataSource = this.dataSource.filter((value) => {
+          return value.id != id;
+        });
+      });
   }
 }

@@ -1,0 +1,10 @@
+<h1 mat-dialog-title>{{ dialogTitle }}</h1>
+<div mat-dialog-content>
+  <mat-form-field *ngIf="showInputField">
+    <input matInput [(ngModel)]="inputFieldText">
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="doAction()" mat-flat-button color="warn">{{ confirmButtonTitle }}</button>
+  <button mat-button (click)="closeDialog()" mat-stroked-button>Cancel</button>
+</div>
