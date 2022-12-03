@@ -21,6 +21,8 @@ import { MatTableModule } from '@angular/material/table'
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthInterceptor } from './services/authentication/auth.interceptor';
 import { AuthGuard } from './guards/auth.guard';
+import { MatRippleModule } from '@angular/material/core';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -44,7 +46,9 @@ import { AuthGuard } from './guards/auth.guard';
         MatIconModule,
         MatToolbarModule,
         MatTableModule,
-        HttpClientModule
+        HttpClientModule,
+        MatRippleModule,
+        MatDialogModule
     ],
   providers: [
     AuthGuard,
