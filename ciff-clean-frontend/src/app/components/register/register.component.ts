@@ -1,15 +1,17 @@
 import {Component} from '@angular/core';
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {getErrorMessageUtil, matchPassword, strongPass} from "../../util/validators";
-import {AuthService, CreateUserDTO} from "../../services/networking";
+import {AuthService, CreateUserDTO, UserService} from "../../services/networking";
 import {StorageService} from "../../services/authentication/storage.service";
 import {Router} from "@angular/router";
+import {catchError} from "rxjs/operators";
+import {HttpErrorResponse} from "@angular/common/http";
 
 @Component({
   selector: 'ciff-clean-register',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
-  providers: [AuthService]
+  providers: [AuthService, UserService]
 })
 export class RegisterComponent {
   registerForm = new FormGroup({
@@ -21,8 +23,10 @@ export class RegisterComponent {
   }, matchPassword);
   hidePassword = true;
   hideConfirm = true;
+  errorMessage: string | null = null;
 
-  constructor(private authService: AuthService, private storageService: StorageService, private router: Router) {
+  constructor(private authService: AuthService, private storageService: StorageService, private router: Router,
+              private userService: UserService) {
   }
 
   get emailControl(): FormControl {
@@ -53,10 +57,18 @@ export class RegisterComponent {
       password: this.passwordControl.value
     };
 
-    // TODO: save userDTO to StorageService
-    this.authService.registerUser(user).subscribe((userToken) => {
+    this.authService.registerUser(user).pipe(catchError((error, caught) => {
+      //TODO error status
+      if (error instanceof HttpErrorResponse) {
+        this.errorMessage = "Incorrect email or password";
+      }
+      return caught;
+    })).subscribe((userToken) => {
         this.storageService.saveToken(userToken.value ?? "");
-        this.router.navigate(["file-list"]);
+        this.userService.getUser().subscribe((user) => {
+          this.storageService.saveUser(user);
+          this.router.navigate(["file-list"]);
+        })
       },
     );
   }

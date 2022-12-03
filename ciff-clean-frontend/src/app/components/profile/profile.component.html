@@ -31,7 +31,7 @@
     </mat-form-field>
     <mat-form-field appearance="fill" class="field">
       <mat-label>New password</mat-label>
-      <input matInput placeholder="adam@example.com" [formControl]="passwordControl"
+      <input matInput [formControl]="passwordControl"
              [type]="hideNew ? 'password' : 'text'">
       <button mat-icon-button matSuffix (click)="hideNew = !hideNew" [attr.aria-label]="'Hide password'"
               [attr.aria-pressed]="hideNew">
@@ -41,7 +41,7 @@
     </mat-form-field>
     <mat-form-field appearance="fill" class="field">
       <mat-label>Password confirm</mat-label>
-      <input matInput placeholder="adam@example.com" [formControl]="confirmControl"
+      <input matInput [formControl]="confirmControl"
              [type]="hideConfirm ? 'password' : 'text'">
       <button mat-icon-button matSuffix (click)="hideConfirm = !hideConfirm" [attr.aria-label]="'Hide password'"
               [attr.aria-pressed]="hideConfirm">
