@@ -46,23 +46,25 @@ public class MediaController {
     private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("comment")
-    public ResponseEntity<Void> commentFile(@RequestHeader(value = "Authorization") String authorization,
+    public ResponseEntity<MediaDTO> commentFile(@RequestHeader(value = "Authorization") String authorization,
         @RequestBody CreateCommentDTO body) {
+            Long currentUserId = -1L;
             try {
-                Long currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
+                currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
                 logService.logActivity(currentUserId, "COMMENT", body.getFileId());
                 mediaService.commentFile(body, currentUserId);
-                return ResponseEntity.ok().build();
+                var res = mediaService.getGif(body.getFileId());
+                return ResponseEntity.ok(res.toMediaDTO());
             } catch (NoSuchElementException e) {
                 if(e.getMessage().equals(MediaService.FILE_NOT_FOUND)){
-                    logService.logActivity(jwtTokenUtil.getCurrentUserId(authorization), "COMMENT", null);
+                    logService.logActivity(currentUserId, "COMMENT", null);
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
                 }
-                logService.logError("UNAUTHORIZED", "COMMENT");
+                logService.logError(currentUserId, "UNAUTHORIZED", "COMMENT");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }  catch (Exception e) {
                 e.printStackTrace();
-                logService.logError(e.getMessage(), "COMMENT");
+                logService.logError(currentUserId, e.getMessage(), "COMMENT");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
     }
@@ -71,24 +73,26 @@ public class MediaController {
     public ResponseEntity<Void> deleteFile(
             @PathVariable Long id,
             @RequestHeader(value = "Authorization") String authorization) {
+       Long currentUserId = -1L;
         try {
-            Long currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
+            currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
             logService.logActivity(currentUserId, "DELETE", id);
             checkUserRole(currentUserId, UserRole.Admin);
             mediaService.deleteFile(id);
             return ResponseEntity.noContent().build();
         } catch (NoSuchElementException e) {
             if(e.getMessage().equals(MediaService.FILE_NOT_FOUND)){
+                logService.logActivity(currentUserId, "COMMENT", null);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-            logService.logError("UNAUTHORIZED", "DELETE");
+            logService.logError(currentUserId, "UNAUTHORIZED", "DELETE");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (IllegalArgumentException e) {
-            logService.logError(jwtTokenUtil.getCurrentUserId(authorization).toString() + " IS NOT ADMIN", "DELETE");
+            logService.logError(currentUserId, currentUserId.toString() + " IS NOT ADMIN", "DELETE");
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } catch (Exception e) {
             e.printStackTrace();
-            logService.logError(e.getMessage(), "DELETE");
+            logService.logError(currentUserId, e.getMessage(), "DELETE");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -96,30 +100,34 @@ public class MediaController {
     @GetMapping("{id}/download")
     public ResponseEntity<byte[]> downloadFile(@PathVariable("id") Long id,
             @RequestHeader(value = "Authorization") String authorization) {
+        Long currentUserId = -1L;
         try {
+            currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
             jwtTokenUtil.checkIfUserIsAuthenticated(authorization);
-            logService.logActivity(jwtTokenUtil.getCurrentUserId(authorization), "DOWNLOAD", id);
+            logService.logActivity(currentUserId, "DOWNLOAD", id);
             var res = mediaService.downloadFile(id);
             return ResponseEntity.ok(res);
         } catch (NoSuchElementException e) {
             if(e.getMessage().equals(MediaService.FILE_NOT_FOUND)){
-                logService.logActivity(jwtTokenUtil.getCurrentUserId(authorization), "DOWNLOAD", null);
+                logService.logActivity(currentUserId, "DOWNLOAD", null);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-            logService.logError("UNAUTHORIZED", "DOWNLOAD");
+            logService.logError(currentUserId, "UNAUTHORIZED", "DOWNLOAD");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
-            logService.logError(e.getMessage(), "DOWNLOAD");
+            logService.logError(currentUserId, e.getMessage(), "DOWNLOAD");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping
     public ResponseEntity<List<MediaDTO>> getFiles(@RequestHeader(value = "Authorization") String authorization) {
+        Long currentUserId = -1L;
         try {
+            currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
             jwtTokenUtil.checkIfUserIsAuthenticated(authorization);
-            logService.logActivity(jwtTokenUtil.getCurrentUserId(authorization), "GETALLFILES", null);
+            logService.logActivity(currentUserId, "GETALLFILES", null);
             List<GifFile> results = mediaService.findFiles("");
             ArrayList<MediaDTO> dtos = new ArrayList<MediaDTO>();
             for (GifFile gifFile : results) {
@@ -127,26 +135,60 @@ public class MediaController {
             }
             return ResponseEntity.ok().body(dtos);
         } catch (NoSuchElementException e) {
-            logService.logError("UNAUTHORIZED", "GETALLFILES");
+            logService.logError(currentUserId, "UNAUTHORIZED", "GETALLFILES");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
-            logService.logError(e.getMessage(), "GETALLFILES");
+            logService.logError(currentUserId, e.getMessage(), "GETALLFILES");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<MediaDTO> getFileById(
+        @PathVariable("id") Long id,
+        @RequestHeader(value = "Authorization") String authorization) {
+        Long currentUserId = -1L;
+        try {
+            currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
+            jwtTokenUtil.checkIfUserIsAuthenticated(authorization);
+            logService.logActivity(currentUserId, "GETFILEBYID", id);
+            var res = mediaService.getGif(id).toMediaDTO();
+            return ResponseEntity.ok(res);
+        } catch (NoSuchElementException e) {
+            logService.logError(currentUserId, "UNAUTHORIZED", "GETFILEBYID");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logService.logError(currentUserId, e.getMessage(), "GETFILEBYID");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @GetMapping("search")
     public ResponseEntity<List<MediaDTO>> searchFile(
-        @RequestParam String query
+        @RequestParam String query,
+        @RequestHeader(value = "Authorization") String authorization
     ) {
-        logService.logActivity(-1L, "SEARCH", null);
-        List<GifFile> results = mediaService.findFiles(query);
-        ArrayList<MediaDTO> dtos = new ArrayList<MediaDTO>();
-        for (GifFile gifFile : results) {
-            dtos.add(gifFile.toMediaDTO());
+        Long currentUserId = -1L;
+        try {
+            currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
+            jwtTokenUtil.checkIfUserIsAuthenticated(authorization);
+            logService.logActivity(currentUserId, "SEARCH " + query, null);
+            List<GifFile> results = mediaService.findFiles(query);
+            ArrayList<MediaDTO> dtos = new ArrayList<MediaDTO>();
+            for (GifFile gifFile : results) {
+                dtos.add(gifFile.toMediaDTO());
+            }
+            return ResponseEntity.ok().body(dtos);
+        } catch (NoSuchElementException e) {
+            logService.logError(currentUserId, "UNAUTHORIZED", "SEARCH");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            logService.logError(currentUserId, e.getMessage(), "SEARCH");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.ok().body(dtos);
     }
 
     @PutMapping("{file_id}/modify")
@@ -155,23 +197,24 @@ public class MediaController {
         @PathVariable Long file_id,
         @RequestBody EditFileDTO body
     ) {
+        Long currentUserId = -1L;
         try {
+            currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
             jwtTokenUtil.checkIfUserIsAuthenticated(authorization);
-            Long currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
             logService.logActivity(currentUserId, "MODIFYFILE START", file_id);
             GifFile gifFile = mediaService.editFileName(file_id, body.getFileName());
             logService.logActivity(currentUserId, "MODIFYFILE OK", file_id);
             return ResponseEntity.ok().body(gifFile.toMediaDTO());
         } catch (NoSuchElementException e) {
             if(e.getMessage().equals(MediaService.FILE_NOT_FOUND)){
-                logService.logActivity(jwtTokenUtil.getCurrentUserId(authorization), "DOWNLOAD", null);
+                logService.logActivity(currentUserId, "DOWNLOAD", null);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-            logService.logError("UNAUTHORIZED", "MODIFYFILE");
+            logService.logError(currentUserId, "UNAUTHORIZED", "MODIFYFILE");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
-            logService.logError(e.getMessage(), "MODIFYFILE");
+            logService.logError(currentUserId, e.getMessage(), "MODIFYFILE");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -181,24 +224,25 @@ public class MediaController {
         @RequestHeader(value = "Authorization") String authorization,
         @RequestParam("file") MultipartFile file
     ) {
+        Long currentUserId = -1L;
         try {
-            Long currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
-            logService.logActivity(currentUserId, "UPLOAD", null);
+            currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
+            logService.logActivity(currentUserId, "UPLOAD START", null);
             jwtTokenUtil.checkIfUserIsAuthenticated(authorization);
             byte[] content = IOUtils.toByteArray(file.getInputStream());
             Long id = mediaService.addCaff(content, file.getName(), currentUserId);
             if (id == -1L){
-                logService.logError(currentUserId + " CANNOT UPLOAD", "UPLOAD");
+                logService.logError(currentUserId, "CANNOT UPLOAD", "UPLOAD");
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
-            logService.logActivity(currentUserId, "UPLOAD", id);
+            logService.logActivity(currentUserId, "UPLOAD DONE", id);
             return ResponseEntity.ok().body(id);
         } catch (NoSuchElementException e) {
-            logService.logError("UNAUTHORIZED", "UPLOAD");
+            logService.logError(currentUserId, "UNAUTHORIZED", "UPLOAD");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
             e.printStackTrace();
-            logService.logError(e.getMessage(), "UPLOAD");
+            logService.logError(currentUserId, e.getMessage(), "UPLOAD");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
