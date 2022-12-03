@@ -76,7 +76,7 @@ public class AuthController {
                 if (jwtTokenUtil.isValidToken(token, userId)) {
                     Optional<AppUser> appUser = userRepository.findById(userId);
                     if(!appUser.isPresent()){   return ResponseEntity.status(HttpStatus.NO_CONTENT).build();}
-                    if(appUser.get().getEmail().equals(changeUserPasswordDTO.getOldPassword())){
+                    if(appUser.get().getPassword().equals(changeUserPasswordDTO.getOldPassword())){
                         AppUser changedUser = appUser.get();
                         changedUser.setPassword(changeUserPasswordDTO.getNewPassword());
                         userRepository.save(changedUser);
