@@ -24,6 +24,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { MatRippleModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DialogBoxComponent } from './components/dialog-box/dialog-box.component';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,8 @@ import { DialogBoxComponent } from './components/dialog-box/dialog-box.component
         HttpClientModule,
         MatRippleModule,
         MatDialogModule,
-        FormsModule
+        FormsModule,
+        MatSnackBarModule
     ],
   providers: [
     AuthGuard,

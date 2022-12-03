@@ -3,6 +3,7 @@ import { StorageService } from 'src/app/services/authentication/storage.service'
 import { EditFileDTO, MediaDTO, MediaService, UserRole } from 'src/app/services/networking';
 import { MatDialog } from '@angular/material/dialog';
 import { DialogBoxAction, DialogBoxComponent, DialogBoxData } from '../dialog-box/dialog-box.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 export interface MediaModel { 
   id: number;
@@ -41,7 +42,7 @@ export class FileListComponent {
   isAdmin: boolean;
   
 
-  constructor(public dialog: MatDialog, private mediaService: MediaService, private storageService: StorageService) {
+  constructor(public dialog: MatDialog, private mediaService: MediaService, private storageService: StorageService, private snackBar: MatSnackBar) {
     this.isAdmin = storageService.getUser()?.role === UserRole.Admin;
     this.isAdmin = true;
     this.displayedColumns = this.isAdmin ? ['name', 'uploaderName', 'uploadDate', 'numberOfComments', 'modify', 'delete'] : ['name', 'uploaderName', 'uploadDate', 'numberOfComments'];
@@ -136,7 +137,9 @@ export class FileListComponent {
     };
     this.mediaService.modifyFile(editDTO, data.id)
     .subscribe(() => {
-      // TODO: snackbar with success message
+      this.snackBar.open("Modified successfully!", undefined, {
+        duration: 2000,
+      });
       this.dataSource = this.dataSource.filter((value) => {
         if (value.id == data.id && data.inputFieldText) {
           value.fileName = data.inputFieldText;
@@ -150,7 +153,9 @@ export class FileListComponent {
     console.log(id);
     this.mediaService.deleteFile(id)
       .subscribe(() => {
-        // TODO: snackbar with success message
+        this.snackBar.open("Deleted successfully!", undefined, {
+          duration: 2000,
+        });
         this.dataSource = this.dataSource.filter((value) => {
           return value.id != id;
         });
