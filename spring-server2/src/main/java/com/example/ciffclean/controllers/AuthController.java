@@ -20,6 +20,7 @@ import com.example.ciffclean.models.CreateUserDTO;
 import com.example.ciffclean.models.LoginUserDTO;
 import com.example.ciffclean.models.UserTokenDTO;
 import com.example.ciffclean.repositories.UserRepository;
+import com.example.ciffclean.service.JwtTokenUtil;
 
 @CrossOrigin
 @RestController
@@ -28,6 +29,9 @@ public class AuthController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
     @PostMapping("register")
     public ResponseEntity<UserTokenDTO> registerUser(@RequestBody CreateUserDTO createUserDTO){
@@ -85,9 +89,7 @@ public class AuthController {
     private UserTokenDTO generateUserTokenDTO(AppUser appUser){
         UserTokenDTO userTokenDTO = new UserTokenDTO();
         userTokenDTO.setUserId(appUser.getId());
-        userTokenDTO.setValue(appUser.getFullName()); //TODO: Mi legyen benne?
-        userTokenDTO.setExpirationDate(LocalDateTime.now()
-            .plus(Duration.of(10, ChronoUnit.MINUTES)));  //TODO: Meddig legyen érvényes?
+        userTokenDTO.setToken(jwtTokenUtil.generateToken(appUser.getId(), appUser.getFullName())); 
         return userTokenDTO;
     }
     
