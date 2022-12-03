@@ -46,7 +46,7 @@ public class MediaServiceTest {
 
 	@Test
 	public void modifyCaffTest() throws Exception {
-		var id = addCaff2ReturnData().a;
+		var id = addCaff2ReturnData();
 		
 		List<GifFile> result = gifFileRepository.findByNameContains("test");
 		assertEquals(1, result.size());
@@ -77,9 +77,8 @@ public class MediaServiceTest {
 	@Test
 	public void downloadFileTest() throws Exception{
 		addCaff1();
-		var caff2 = addCaff2ReturnData();
-		var id = caff2.a;
-		var data = caff2.b;
+		var id = addCaff2ReturnData();
+		var data = gifFileRepository.findById(id).get().getContent();
 		var res = mediaService.downloadFile(id);
 		assertArrayEquals(data, res);
 		assertNotEquals(res.length, 0);
@@ -87,7 +86,7 @@ public class MediaServiceTest {
 
 	@Test
 	public void commentFileTest() throws Exception{
-		var id = addCaff2ReturnData().a;
+		var id = addCaff2ReturnData();
 		CreateCommentDTO newComment = new CreateCommentDTO();
 		newComment.setFileId(id);
 		newComment.setText("This is my new comment");
@@ -103,7 +102,7 @@ public class MediaServiceTest {
 	@Test
 	public void deleteFileTest() throws Exception{
 		addCaff1();
-		var id = addCaff2ReturnData().a;
+		var id = addCaff2ReturnData();
 		mediaService.deleteFile(id);
 		var result = mediaService.findFiles("");
 		assertEquals(1, result.size());
@@ -124,13 +123,12 @@ public class MediaServiceTest {
 		assertNotEquals(id, -1L);
 	}
 
-	private org.antlr.v4.runtime.misc.Pair<Long, byte[]> addCaff2ReturnData() throws Exception{
+	private Long addCaff2ReturnData() throws Exception{
 		Path path = Paths.get("src/test/resources/caff_files/2.caff");
 		byte[] data = Files.readAllBytes(path);
 		Long id = mediaService.addCaff(data, "test2", null);
 		assertNotEquals(id, -1L);
-		var res = new org.antlr.v4.runtime.misc.Pair<Long, byte[]>(id, data);
-		return res;
+		return id;
 	}
 	
 	private Long saveUser() {

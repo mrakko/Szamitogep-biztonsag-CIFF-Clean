@@ -20,7 +20,7 @@ public class JwtTokenUtil implements Serializable {
     @Value("${jwt.secret}")
     private String secret;
     
-    private final int tokenExpiryTime = 24 * 60 * 60 * 60 * 1000; //1 nap
+    private final int tokenExpiryTime = 10 * 60 * 60 * 1000; //10 perc
 
     public Long getCurrentUserId(String authorization){
         var id = getUserIdFromToken(authorization);
@@ -97,4 +97,10 @@ public class JwtTokenUtil implements Serializable {
     private boolean isExpired(Claims claims) {
         return new Date(System.currentTimeMillis()).after(claims.getExpiration());
     }
+    
+    public Long getUserId(String token){
+        Claims claims = getAllClaimsFromToken(token);
+        return doGetUserId(claims);
+    }
+
 }

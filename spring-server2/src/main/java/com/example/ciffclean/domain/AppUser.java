@@ -44,7 +44,7 @@ public class AppUser {
     this.imageId = imageId;
   }
 
-  @OneToMany(cascade = CascadeType.MERGE, mappedBy = "userId", orphanRemoval = true)
+  @OneToMany(cascade = CascadeType.MERGE, mappedBy = "user", orphanRemoval = true)
   private List<GifFile> gifFiles = new ArrayList<GifFile>();
 
   public Long getId() {

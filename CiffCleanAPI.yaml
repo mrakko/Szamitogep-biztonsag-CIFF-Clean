@@ -267,11 +267,8 @@ components:
     UserTokenDTO:
       type: object
       properties:
-        value:
+        token:
           type: string
-        expirationDate:
-          type: string
-          format: date-time
         userId:
           type: integer
     ChangeUserPasswordDTO:
