@@ -6,10 +6,11 @@ import {MediaService} from "../../services/networking";
 @Component({
   selector: 'ciff-clean-details',
   templateUrl: './details.component.html',
-  styleUrls: ['./details.component.scss']
+  styleUrls: ['./details.component.scss'],
+  providers: [MediaService]
 })
 export class DetailsComponent implements OnInit {
-  file: MediaModel = {}
+  file: MediaModel | undefined = undefined;
   constructor(private route: ActivatedRoute, private mediaService: MediaService) {
   }
 
