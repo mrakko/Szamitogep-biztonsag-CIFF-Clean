@@ -1,4 +1,5 @@
 package com.example.ciffclean.models;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -14,19 +15,19 @@ public class MediaDTO {
     private PublicUserDTO uploader;
     
     public PublicUserDTO getUploader() {
-      return uploader;
+      return new PublicUserDTO(uploader);
     }
 
     public void setUploader(PublicUserDTO uploader) {
-      this.uploader = uploader;
+      this.uploader = new PublicUserDTO(uploader);
     }
 
     public Date getUploadDate() {
-      return uploadDate;
+      return (Date) uploadDate.clone();
     }
 
     public void setUploadDate(Date uploadDate) {
-      this.uploadDate = uploadDate;
+      this.uploadDate = (Date) uploadDate.clone();
     }
 
     public Integer getFileId() {
@@ -46,11 +47,11 @@ public class MediaDTO {
     }
 
     public List<CommentDTO> getComments() {
-      return comments;
+      return new ArrayList<CommentDTO>(comments);
     }
 
     public void setComments(List<CommentDTO> comments) {
-      this.comments = comments;
+      this.comments = new ArrayList<CommentDTO>(comments);
     }
 
 

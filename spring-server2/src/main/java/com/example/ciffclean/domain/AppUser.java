@@ -90,6 +90,18 @@ public class AppUser {
     this.role = role;
   }
 
+  public AppUser() {}
+
+  public AppUser(AppUser other){
+    this.id = other.id;
+    this.address = other.address;
+    this.email = other.email;
+    this.fullName = other.fullName;
+    this.imageId = other.imageId;
+    this.password = other.password;
+    this.role = other.role;
+  }
+
   public PublicUserDTO toPublicUserDTO() {
     PublicUserDTO dto = new PublicUserDTO();
     dto.setFullName(fullName);

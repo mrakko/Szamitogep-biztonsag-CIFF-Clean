@@ -16,7 +16,7 @@ public class UserDTO   {
   private byte[] profileImage;
 
   public byte[] getProfileImage() {
-    return profileImage;
+    return profileImage.clone();
   }
   
   public UserDTO(){}
@@ -49,7 +49,7 @@ public class UserDTO   {
   }
 
   public void setImage(byte[] value){
-    this.profileImage = value;
+    this.profileImage = value.clone();
   }
 
   public void setFullName(String value) {

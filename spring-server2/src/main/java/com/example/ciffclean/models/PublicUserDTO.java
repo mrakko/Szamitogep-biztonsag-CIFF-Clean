@@ -9,7 +9,14 @@ public class PublicUserDTO   {
 
   private byte[] profileImage = null;
 
-  
+  public PublicUserDTO() {}
+
+  public PublicUserDTO(PublicUserDTO other) {
+    this.id = other.id;
+    this.role = other.role;
+    this.profileImage = other.profileImage.clone();
+  }
+
   public Integer getId() {
     return id;
   }
@@ -36,11 +43,11 @@ public class PublicUserDTO   {
   }
 
   public byte[] getProfileImage() {
-    return profileImage;
+    return profileImage.clone();
   }
 
   public void setProfileImage(byte[] profileImage) {
-    this.profileImage = profileImage;
+    this.profileImage = profileImage.clone();
   }
 
 }
