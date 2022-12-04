@@ -97,7 +97,7 @@ public class AuthController {
             authService.changePassword(currentUserId, changeUserPasswordDTO.getOldPassword(), changeUserPasswordDTO.getNewPassword());
             logService.logActivity(currentUserId, "CHANGE_PASSWORD SUCCESSFUL", null);
             return ResponseEntity.ok(true);
-        } catch (NoSuchElementException e){
+        } catch (NoSuchElementException | SignatureException e){
             logService.logError(currentUserId, "UNAUTHORIZED", "CHANGE_PASSWORD");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }catch(DataAccessException e){

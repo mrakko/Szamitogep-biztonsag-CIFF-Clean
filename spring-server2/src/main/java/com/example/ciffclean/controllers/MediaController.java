@@ -28,6 +28,8 @@ import com.example.ciffclean.service.LogService;
 import com.example.ciffclean.service.MediaService;
 import com.example.ciffclean.service.UserService;
 
+import io.jsonwebtoken.SignatureException;
+
 @CrossOrigin(origins ={"http://localhost:8080", "http://localhost:4200"})
 @RestController
 @RequestMapping("/media")
@@ -55,7 +57,7 @@ public class MediaController {
                 mediaService.commentFile(body, currentUserId);
                 var res = mediaService.getGif(body.getFileId());
                 return ResponseEntity.ok(res.toMediaDTO());
-            } catch (NoSuchElementException e) {
+            } catch (NoSuchElementException | SignatureException e) {
                 if(e.getMessage().equals(MediaService.FILE_NOT_FOUND)){
                     logService.logActivity(currentUserId, "COMMENT", null);
                     return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -81,7 +83,7 @@ public class MediaController {
             mediaService.deleteFile(id);
             logService.logActivity(currentUserId, "DELETE DONE", id);
             return ResponseEntity.noContent().build();
-        } catch (NoSuchElementException e) {
+        } catch (NoSuchElementException | SignatureException e) {
             if(e.getMessage().equals(MediaService.FILE_NOT_FOUND)){
                 logService.logActivity(currentUserId, "COMMENT", null);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -108,7 +110,7 @@ public class MediaController {
             logService.logActivity(currentUserId, "DOWNLOAD", id);
             var res = mediaService.downloadFile(id);
             return ResponseEntity.ok(res);
-        } catch (NoSuchElementException e) {
+        } catch (NoSuchElementException | SignatureException e) {
             if(e.getMessage().equals(MediaService.FILE_NOT_FOUND)){
                 logService.logActivity(currentUserId, "DOWNLOAD", null);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -135,7 +137,7 @@ public class MediaController {
                 dtos.add(gifFile.toMediaDTO());
             }
             return ResponseEntity.ok().body(dtos);
-        } catch (NoSuchElementException e) {
+        } catch (NoSuchElementException | SignatureException e) {
             logService.logError(currentUserId, "UNAUTHORIZED", "GETALLFILES");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
@@ -156,7 +158,7 @@ public class MediaController {
             logService.logActivity(currentUserId, "GETFILEBYID", id);
             var res = mediaService.getGif(id).toMediaDTO();
             return ResponseEntity.ok(res);
-        } catch (NoSuchElementException e) {
+        } catch (NoSuchElementException | SignatureException e) {
             logService.logError(currentUserId, "UNAUTHORIZED", "GETFILEBYID");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
@@ -182,7 +184,7 @@ public class MediaController {
                 dtos.add(gifFile.toMediaDTO());
             }
             return ResponseEntity.ok().body(dtos);
-        } catch (NoSuchElementException e) {
+        } catch (NoSuchElementException | SignatureException e) {
             logService.logError(currentUserId, "UNAUTHORIZED", "SEARCH");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
@@ -207,7 +209,7 @@ public class MediaController {
             GifFile gifFile = mediaService.editFileName(file_id, body.getFileName());
             logService.logActivity(currentUserId, "MODIFYFILE OK", file_id);
             return ResponseEntity.ok().body(gifFile.toMediaDTO());
-        } catch (NoSuchElementException e) {
+        } catch (NoSuchElementException | SignatureException e) {
             if(e.getMessage().equals(MediaService.FILE_NOT_FOUND)){
                 logService.logActivity(currentUserId, "DOWNLOAD", null);
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

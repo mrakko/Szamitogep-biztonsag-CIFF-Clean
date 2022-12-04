@@ -7,8 +7,11 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import com.example.ciffclean.repositories.UserRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -16,6 +19,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
 public class JwtTokenUtil implements Serializable {
+
+    @Autowired
+    UserRepository userRepository;
     
     @Value("${jwt.secret}")
     private String secret = "Secret";
@@ -46,6 +52,10 @@ public class JwtTokenUtil implements Serializable {
         if(!token.isEmpty()){
             Claims claims = getAllClaimsFromToken(token.get());
             if(isExpired(claims)) {return Optional.empty();}
+            if(!userRepository.findById(doGetUserId(claims)).isPresent()){
+                return Optional.empty();
+            }
+
             var res = doGetUserId(claims);
             return Optional.of(res);
         }
