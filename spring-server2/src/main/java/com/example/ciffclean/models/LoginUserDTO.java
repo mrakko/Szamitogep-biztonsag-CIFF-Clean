@@ -1,7 +1,6 @@
 package com.example.ciffclean.models;
 
 public class LoginUserDTO {
-    //TODO: Fromat: email
     private String email;
 
     private String password;

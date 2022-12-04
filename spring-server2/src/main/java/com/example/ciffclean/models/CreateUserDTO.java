@@ -4,14 +4,12 @@ public class CreateUserDTO {
 
     private String address;
 
-    //TODO: Format: email
     private String email;
 
     private String password;
 
     private String fullName;
 
-    //TODO: Format: binary
     private String profilImage;
 
     public String getAddress() {

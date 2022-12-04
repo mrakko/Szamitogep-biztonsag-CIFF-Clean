@@ -1,7 +1,13 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
 
 .flex-center {
   display: flex;
@@ -10,8 +16,8 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   justify-content: center;
 }
 
-.max-height{
-  height: 100%;
+.max-height {
+  min-height: 100%;
   background: linear-gradient(to right, rgb(38 120 55 / 20%), rgb(138 19 1 / 20%));
 }
 
