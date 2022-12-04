@@ -47,7 +47,6 @@ export class FileListComponent implements OnInit{
               private router: Router) {
 
     this.isAdmin = storageService.getUser()?.role === UserRole.Admin;
-    this.isAdmin = true;
     this.displayedColumns = this.isAdmin ? ['name', 'uploaderName', 'uploadDate', 'numberOfComments', 'modify', 'delete'] : ['name', 'uploaderName', 'uploadDate', 'numberOfComments'];
   }
 
