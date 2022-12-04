@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { StorageService } from 'src/app/services/authentication/storage.service';
-import { MediaService } from 'src/app/services/networking';
-import { DialogBoxAction } from '../dialog-box/dialog-box.component';
-import { MediaModel } from '../file-list/file-list.component';
+import {Component} from '@angular/core';
+import {MatDialogRef} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {StorageService} from 'src/app/services/authentication/storage.service';
+import {MediaService} from 'src/app/services/networking';
+import {DialogBoxAction} from '../dialog-box/dialog-box.component';
+import {MediaModel} from '../file-list/file-list.component';
 
 @Component({
   selector: 'ciff-clean-file-upload',
@@ -16,7 +16,8 @@ export class FileUploadComponent {
 
   fileToUpload: File | null = null;
 
-  constructor(private mediaService: MediaService, public dialogRef: MatDialogRef<FileUploadComponent>, private snackBar: MatSnackBar, private storageService: StorageService) {}
+  constructor(private mediaService: MediaService, public dialogRef: MatDialogRef<FileUploadComponent>, private snackBar: MatSnackBar, private storageService: StorageService) {
+  }
 
   handleFileInput(event: Event) {
     let fileList = (event.target as HTMLInputElement).files;
@@ -27,9 +28,8 @@ export class FileUploadComponent {
   uploadFileToActivity() {
     const file = this.fileToUpload;
     if (file) {
-      // TODO: show loader and disable confirm button
       file.arrayBuffer().then((arrayBuffer) => {
-        const blob = new Blob([new Uint8Array(arrayBuffer)], {type: file.type });
+        const blob = new Blob([new Uint8Array(arrayBuffer)], {type: file.type});
         this.mediaService.uploadFileForm(blob).subscribe((fileId) => {
           this.snackBar.open("Uploaded successfully!", undefined, {
             duration: 2000,
@@ -46,16 +46,16 @@ export class FileUploadComponent {
             event: DialogBoxAction.Confirm,
             data: uploadedModel
           });
-          });
+        });
       });
     }
   }
 
-  upload(){
+  upload() {
     this.uploadFileToActivity();
   }
 
-  closeDialog(){
+  closeDialog() {
     this.dialogRef.close({
       event: DialogBoxAction.Cancel
     });

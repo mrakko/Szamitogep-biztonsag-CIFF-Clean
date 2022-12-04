@@ -1,11 +1,11 @@
-import { StorageService } from 'src/app/services/authentication/storage.service';
-import { EditFileDTO, MediaDTO, MediaService, UserRole } from 'src/app/services/networking';
-import { MatDialog } from '@angular/material/dialog';
-import { DialogBoxAction, DialogBoxComponent, DialogBoxData } from '../dialog-box/dialog-box.component';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {StorageService} from 'src/app/services/authentication/storage.service';
+import {EditFileDTO, MediaDTO, MediaService, UserRole} from 'src/app/services/networking';
+import {MatDialog} from '@angular/material/dialog';
+import {DialogBoxAction, DialogBoxComponent, DialogBoxData} from '../dialog-box/dialog-box.component';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {Component, OnInit} from "@angular/core";
 import {Router} from "@angular/router";
-import { FileUploadComponent } from '../file-upload/file-upload.component';
+import {FileUploadComponent} from '../file-upload/file-upload.component';
 
 export interface MediaModel {
   id: number;
@@ -35,7 +35,7 @@ const TEST_MEDIA_DATA: MediaModel[] = [
   providers: [MediaService]
 })
 
-export class FileListComponent implements OnInit{
+export class FileListComponent implements OnInit {
   public displayedColumns: string[];
   public dataSource = TEST_MEDIA_DATA;
   inputFieldText?: string;
@@ -52,8 +52,7 @@ export class FileListComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    // TODO: uncomment below upon backend is ready
-     this.getMediaItems();
+    this.getMediaItems();
   }
 
   getMediaItems() {
@@ -74,7 +73,6 @@ export class FileListComponent implements OnInit{
   }
 
   onRowClicked(row: MediaModel) {
-    console.log('Row clicked: ', row);
     this.router.navigate(['details', row.id], {state: row});
   }
 
@@ -105,7 +103,6 @@ export class FileListComponent implements OnInit{
   }
 
   onUploadClick() {
-    console.log('Upload clicked');
     const dialogRef = this.dialog.open(FileUploadComponent, {
       width: '310px'
     });
@@ -121,13 +118,11 @@ export class FileListComponent implements OnInit{
 
   onModifyClick(event: Event, media: MediaModel) {
     event.stopPropagation();
-    console.log('Modify clicked ', media);
     this.openDialog(OpenDialogReason.Modify, media);
   }
 
   onDeleteClick(event: Event, media: MediaModel) {
     event.stopPropagation();
-    console.log('Delete clicked ', media);
     this.openDialog(OpenDialogReason.Delete, media);
   }
 
@@ -160,7 +155,7 @@ export class FileListComponent implements OnInit{
     });
   }
 
-  addRowData(newMedia: MediaModel){
+  addRowData(newMedia: MediaModel) {
     this.models.push(newMedia);
     this.dataSource = this.models
   }
@@ -169,27 +164,25 @@ export class FileListComponent implements OnInit{
     if (!data.inputFieldText) {
       return;
     }
-    console.log(data);
     const editDTO: EditFileDTO = {
       fileName: data.inputFieldText
     };
     this.mediaService.modifyFile(editDTO, data.id)
-    .subscribe(() => {
-      this.snackBar.open("Modified successfully!", undefined, {
-        duration: 2000,
+      .subscribe(() => {
+        this.snackBar.open("Modified successfully!", undefined, {
+          duration: 2000,
+        });
+        this.dataSource = this.dataSource.filter((value) => {
+          if (value.id == data.id && data.inputFieldText) {
+            value.fileName = data.inputFieldText;
+          }
+          return true;
+        });
+        this.models = this.dataSource;
       });
-      this.dataSource = this.dataSource.filter((value) => {
-        if (value.id == data.id && data.inputFieldText) {
-          value.fileName = data.inputFieldText;
-        }
-        return true;
-      });
-      this.models = this.dataSource;
-    });
   }
 
   deleteRowData(id: number) {
-    console.log(id);
     this.mediaService.deleteFile(id)
       .subscribe(() => {
         this.snackBar.open("Deleted successfully!", undefined, {
