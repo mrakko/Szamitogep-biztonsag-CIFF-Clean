@@ -2,6 +2,7 @@ package com.example.ciffclean.controllers;
 
 import java.util.Optional;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,9 @@ public class AuthController {
     public ResponseEntity<UserTokenDTO> registerUser(@RequestBody CreateUserDTO createUserDTO){
         try{
             //TODO: Input validation
+            if(!EmailValidator.getInstance().isValid(createUserDTO.getEmail())){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
             return ResponseEntity.ok(authService.register(createUserDTO));
 
         }catch (Exception e) {
@@ -65,8 +69,6 @@ public class AuthController {
     public ResponseEntity<Boolean> changePassword(@RequestBody ChangeUserPasswordDTO changeUserPasswordDTO,
                             @RequestHeader(value = "Authorization", required = false) String authorization){
         try{
-            //TODO: Input validation
-            
             Optional<String> otoken = jwtTokenUtil.getTokenFromHeader(authorization);
             if (otoken.isPresent()){
                 String token = otoken.get();
