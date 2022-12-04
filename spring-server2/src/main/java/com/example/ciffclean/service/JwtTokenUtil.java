@@ -20,7 +20,7 @@ public class JwtTokenUtil implements Serializable {
     @Value("${jwt.secret}")
     private String secret = "Secret";
     
-    private final int tokenExpiryTime = 10 * 60 * 60 * 1000; //10 perc
+    private final static int tokenExpiryTime = 10 * 60 * 60 * 1000; //10 perc
 
     public Long getCurrentUserId(String authorization){
         var id = getUserIdFromHeader(authorization);
