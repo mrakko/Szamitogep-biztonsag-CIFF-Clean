@@ -22,6 +22,9 @@ public class AuthService {
     private JwtTokenUtil jwtTokenUtil;
     
     public UserTokenDTO register(CreateUserDTO createUserDTO) throws Exception{
+        if(!userRepository.findByEmail(createUserDTO.getEmail()).isEmpty()){
+            throw new IllegalArgumentException();
+        }
         AppUser appUser = new AppUser();
         appUser.setAddress(createUserDTO.getAddress());
         appUser.setEmail(createUserDTO.getEmail());        

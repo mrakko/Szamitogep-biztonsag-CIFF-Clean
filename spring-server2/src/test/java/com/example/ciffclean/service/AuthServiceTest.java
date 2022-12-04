@@ -23,11 +23,14 @@ public class AuthServiceTest {
     @Autowired
 	private UserRepository userRepository;
 
+    @Autowired
+	private JwtTokenUtil jwtTokenUtil;
+
     @Test
     public void registerTest() throws Exception{
         var dto = createUser();
         authService.register(dto);
-        assertEquals(1, userRepository.count());
+        assertEquals(2, userRepository.count());
     }
 
     @Test
@@ -44,10 +47,11 @@ public class AuthServiceTest {
     @Test
     public void changePasswordTest() throws Exception{
         var dto = createUser();
-        authService.register(dto);
+        var token = authService.register(dto).getToken();
+        var userId = jwtTokenUtil.getUserIdFromToken(token);
 
-        authService.changePassword(1L, dto.getPassword(), "MyNewPass123");
-        var user = userRepository.findById(1L).get();
+        authService.changePassword(userId, dto.getPassword(), "MyNewPass123");
+        var user = userRepository.findById(userId).get();
         assertEquals(user.getPassword(), authService.getHash("MyNewPass123"));
     }
 

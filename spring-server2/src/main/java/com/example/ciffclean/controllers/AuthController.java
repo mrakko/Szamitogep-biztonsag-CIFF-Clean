@@ -48,7 +48,10 @@ public class AuthController {
             var res = authService.register(createUserDTO);
             logService.logActivity(null, "REGISTER SUCCESSFUL: " + createUserDTO.getEmail(), null);
             return ResponseEntity.ok(res);
-        } catch(DataAccessException e){
+        } catch (IllegalArgumentException e){
+            logService.logError(null, "EMAIL ALREADY EXISTS", "REGISTER");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }  catch(DataAccessException e){
             logService.logError(null, e.getMessage(), "REGISTER");
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         } catch (Exception e) {
@@ -65,7 +68,7 @@ public class AuthController {
             var res = new UserTokenDTO();
             logService.logActivity(currentUserId, "LOGIN REQUESTED: " + loginUserDTO.getEmail(), null);
             res.setToken(authService.login(loginUserDTO));
-            currentUserId = jwtTokenUtil.getUserIdFromToken(res.getToken()).get();
+            currentUserId = jwtTokenUtil.getUserIdFromToken(res.getToken());
             logService.logActivity(currentUserId, "SUCCESSFUL LOGIN " + loginUserDTO.getEmail(), null);
             return ResponseEntity.ok(res);
         } catch (NoSuchElementException e){
