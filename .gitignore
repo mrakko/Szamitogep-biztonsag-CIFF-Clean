@@ -1,5 +1,4 @@
 .vscode
-
 parser/obj
 parser/data/*.gif
 parser/*.d
@@ -41,3 +40,6 @@ parser/*.exe
 # System files
 /ciff-clean-frontend/.DS_Store
 /ciff-clean-frontend/Thumbs.db
+ciff-clean-frontend/.angular/
+ciff-clean-frontend/node_modules
+
