@@ -92,6 +92,9 @@ public class AuthController {
         Long currentUserId = -1L;
         try{
             currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
+            if(!jwtTokenUtil.isValidToken(jwtTokenUtil.getTokenFromHeader(authorization).get(), currentUserId)){
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
             logService.logActivity(currentUserId, "CHANGE_PASSWORD REQUESTED", null);
             authService.changePassword(currentUserId, changeUserPasswordDTO.getOldPassword(), changeUserPasswordDTO.getNewPassword());
             logService.logActivity(currentUserId, "CHANGE_PASSWORD SUCCESSFUL", null);
