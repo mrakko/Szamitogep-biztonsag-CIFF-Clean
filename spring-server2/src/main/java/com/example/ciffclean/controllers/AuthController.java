@@ -1,8 +1,10 @@
 package com.example.ciffclean.controllers;
 
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -12,14 +14,14 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.ciffclean.domain.AppUser;
 import com.example.ciffclean.models.ChangeUserPasswordDTO;
 import com.example.ciffclean.models.CreateUserDTO;
 import com.example.ciffclean.models.LoginUserDTO;
 import com.example.ciffclean.models.UserRole;
 import com.example.ciffclean.models.UserTokenDTO;
-import com.example.ciffclean.repositories.UserRepository;
+import com.example.ciffclean.service.AuthService;
 import com.example.ciffclean.service.JwtTokenUtil;
+import com.example.ciffclean.service.LogService;
 
 @CrossOrigin(origins ={"http://localhost:8080", "http://localhost:4200"})
 @RestController
@@ -27,40 +29,57 @@ import com.example.ciffclean.service.JwtTokenUtil;
 public class AuthController {
 
     @Autowired
-    private UserRepository userRepository;
+    private JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    private JwtTokenUtil jwtTokenUtil;
+    private AuthService authService;
+
+    @Autowired
+    private LogService logService;
 
     @PostMapping("register")
     public ResponseEntity<UserTokenDTO> registerUser(@RequestBody CreateUserDTO createUserDTO){
         try{
-            //TODO: Input validation
-            AppUser appUser = new AppUser();
-            appUser.setAddress(createUserDTO.getAddress());
-            appUser.setEmail(createUserDTO.getEmail());
-            appUser.setPassword(createUserDTO.getPassword());   //TODO: Plaintext helyett cizelláltabban...
-            appUser.setFullName(createUserDTO.getFullName());
-            appUser.setRole(UserRole.Regular);
-            userRepository.save(appUser);
-            return ResponseEntity.ok(generateUserTokenDTO(appUser));
-
-        }catch (Exception e) {
+            logService.logActivity(null, "REGISTER REQUESTED: " + createUserDTO.getEmail(), null);
+            if(!EmailValidator.getInstance().isValid(createUserDTO.getEmail()) || !authService.isValidPassword(createUserDTO.getPassword())){
+                logService.logError(null, "INVALID EMAIL OR PASSWORD", "REGISTER");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+            var res = authService.register(createUserDTO);
+            logService.logActivity(null, "REGISTER SUCCESSFUL: " + createUserDTO.getEmail(), null);
+            return ResponseEntity.ok(res);
+        } catch(DataAccessException e){
+            logService.logError(null, e.getMessage(), "REGISTER");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        } catch (Exception e) {
             e.printStackTrace();
+            logService.logError(null, e.getMessage(), "REGISTER");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @PostMapping("login")
     public ResponseEntity<UserTokenDTO> loginUser(@RequestBody LoginUserDTO loginUserDTO){
+        Long currentUserId = -1L;
         try{
-            //TODO: Input validation
-            var userList = userRepository.findByEmail(loginUserDTO.getEmail());
-            if(userList.isEmpty()){ return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); }
-            if(userList.size() != 1){ return ResponseEntity.status(HttpStatus.CONFLICT).build(); }
-            return ResponseEntity.ok(generateUserTokenDTO(userList.get(0)));
-        }catch (Exception e) {
+            var res = new UserTokenDTO();
+            logService.logActivity(currentUserId, "LOGIN REQUESTED: " + loginUserDTO.getEmail(), null);
+            res.setToken(authService.login(loginUserDTO));
+            currentUserId = jwtTokenUtil.getUserIdFromToken(res.getToken()).get();
+            logService.logActivity(currentUserId, "SUCCESSFUL LOGIN " + loginUserDTO.getEmail(), null);
+            return ResponseEntity.ok(res);
+        } catch (NoSuchElementException e){
+            logService.logError(currentUserId, "USER NOT FOUND", "LOGIN");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (IllegalArgumentException e){
+            logService.logError(currentUserId, "INVALID EMAIL OR PASSWORD", "LOGIN");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch(DataAccessException dae){
+            logService.logError(currentUserId, "INVALID EMAIL OR PASSWORD", "LOGIN");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        } catch (Exception e) {
             e.printStackTrace();
+            logService.logError(currentUserId, e.getMessage(), "LOGIN");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -68,38 +87,27 @@ public class AuthController {
     @PostMapping("changePassword")
     public ResponseEntity<Boolean> changePassword(@RequestBody ChangeUserPasswordDTO changeUserPasswordDTO,
                             @RequestHeader(value = "Authorization", required = false) String authorization){
+        Long currentUserId = -1L;
         try{
-            //TODO: Input validation
-            
-            Optional<String> otoken = jwtTokenUtil.getTokenFromHeader(authorization);
-            if (otoken.isPresent()){
-                String token = otoken.get();
-                Long userId = jwtTokenUtil.getUserId(token);
-                if (jwtTokenUtil.isValidToken(token, userId)) {
-                    Optional<AppUser> appUser = userRepository.findById(userId);
-                    if(!appUser.isPresent()){   return ResponseEntity.status(HttpStatus.NO_CONTENT).build();}
-                    if(appUser.get().getPassword().equals(changeUserPasswordDTO.getOldPassword())){
-                        AppUser changedUser = appUser.get();
-                        changedUser.setPassword(changeUserPasswordDTO.getNewPassword());
-                        userRepository.save(changedUser);
-                        return ResponseEntity.ok(true);
-                    }
-                }
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }                
+            currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
+            logService.logActivity(currentUserId, "CHANGE_PASSWORD REQUESTED", null);
+            authService.changePassword(currentUserId, changeUserPasswordDTO.getOldPassword(), changeUserPasswordDTO.getNewPassword());
+            logService.logActivity(currentUserId, "CHANGE_PASSWORD SUCCESSFUL", null);
+            return ResponseEntity.ok(true);
+        } catch (NoSuchElementException e){
+            logService.logError(currentUserId, "UNAUTHORIZED", "CHANGE_PASSWORD");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }catch(DataAccessException e){
+            logService.logError(currentUserId, "INVALID PASSWORD", "CHANGE_PASSWORD");
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }catch(IllegalArgumentException e){
+            logService.logError(currentUserId, "INVALID PASSWORD", "CHANGE_PASSWORD");
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }catch (Exception e) {
             e.printStackTrace();
+            logService.logError(currentUserId, e.getMessage(), "CHANGE_PASSWORD");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-    }
-
-    private UserTokenDTO generateUserTokenDTO(AppUser appUser){
-        String token = jwtTokenUtil.generateToken(appUser.getId(), appUser.getFullName());
-        UserTokenDTO userTokenDTO = new UserTokenDTO();
-        userTokenDTO.setUserId(appUser.getId());
-        userTokenDTO.setToken(token); 
-        return userTokenDTO;
     }
     
 }

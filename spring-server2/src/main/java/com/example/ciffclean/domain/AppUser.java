@@ -3,6 +3,8 @@ package com.example.ciffclean.domain;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.Email;
+
 import com.example.ciffclean.models.PublicUserDTO;
 import com.example.ciffclean.models.UserRole;
 
@@ -35,6 +37,7 @@ public class AppUser {
   private String address;
 
   @Column
+  @Email
   private String email;
 
   @JoinColumn
