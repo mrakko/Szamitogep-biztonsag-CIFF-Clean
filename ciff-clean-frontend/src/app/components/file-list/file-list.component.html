@@ -1,7 +1,10 @@
 <div class="container">
     <mat-form-field>
         <mat-label>Search</mat-label>
-        <input matInput (keyup)="applyFilter($event)" #input>
+        <div class="cancel-button">
+          <input matInput (keyup.enter)="applyFilter($event)" [(ngModel)]="inputFieldText" #input>
+          <button mat-button *ngIf="inputFieldText" (click)="clearSearch()">clear</button>
+        </div>
     </mat-form-field>
     <button mat-raised-button color="primary" (click)="onUploadClick()" class="add-button">
         Upload

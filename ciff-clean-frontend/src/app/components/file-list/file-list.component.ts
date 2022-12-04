@@ -38,6 +38,7 @@ const TEST_MEDIA_DATA: MediaModel[] = [
 export class FileListComponent implements OnInit{
   public displayedColumns: string[];
   public dataSource = TEST_MEDIA_DATA;
+  inputFieldText?: string;
 
   models: MediaModel[] = new Array<MediaModel>();
   filteredModels: MediaModel[] = new Array<MediaModel>();
@@ -56,6 +57,7 @@ export class FileListComponent implements OnInit{
   }
 
   getMediaItems() {
+    this.inputFieldText = "";
     this.mediaService.getFiles()
       .subscribe((items: MediaDTO[]) => {
         this.models = items.map((item: MediaDTO) => {
@@ -77,8 +79,29 @@ export class FileListComponent implements OnInit{
   }
 
   applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    console.log('Filtering for: ', filterValue);
+    const filterValue = (event.target as HTMLInputElement).value.trim();
+    if (!filterValue) {
+      this.getMediaItems();
+      return;
+    }
+    this.mediaService.searchFile(filterValue)
+      .subscribe((items: MediaDTO[]) => {
+        this.filteredModels = items.map((item: MediaDTO) => {
+          return {
+            id: item.fileId,
+            fileName: item.fileName,
+            uploaderName: item.uploader.fullName,
+            uploadDate: item.uploadDate,
+            numberOfComments: item.comments.length
+          }
+        });
+        this.dataSource = this.filteredModels;
+      });
+  }
+
+  clearSearch() {
+    this.inputFieldText = "";
+    this.getMediaItems();
   }
 
   onUploadClick() {
