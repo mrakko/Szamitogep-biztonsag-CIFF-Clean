@@ -22,6 +22,8 @@ import com.example.ciffclean.service.AuthService;
 import com.example.ciffclean.service.JwtTokenUtil;
 import com.example.ciffclean.service.LogService;
 
+import io.jsonwebtoken.SignatureException;
+
 @CrossOrigin
 @RestController
 @RequestMapping("/auth")
@@ -40,7 +42,7 @@ public class AuthController {
     public ResponseEntity<UserTokenDTO> registerUser(@RequestBody CreateUserDTO createUserDTO){
         try{
             logService.logActivity(null, "REGISTER REQUESTED: " + createUserDTO.getEmail(), null);
-            if(!EmailValidator.getInstance().isValid(createUserDTO.getEmail()) || !authService.isValidPassword(createUserDTO.getPassword())){
+            if(/*!EmailValidator.getInstance().isValid(createUserDTO.getEmail()) ||*/ !authService.isValidPassword(createUserDTO.getPassword())){
                 logService.logError(null, "INVALID EMAIL OR PASSWORD", "REGISTER");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
@@ -99,7 +101,7 @@ public class AuthController {
             authService.changePassword(currentUserId, changeUserPasswordDTO.getOldPassword(), changeUserPasswordDTO.getNewPassword());
             logService.logActivity(currentUserId, "CHANGE_PASSWORD SUCCESSFUL", null);
             return ResponseEntity.ok(true);
-        } catch (NoSuchElementException e){
+        } catch (NoSuchElementException | SignatureException e){
             logService.logError(currentUserId, "UNAUTHORIZED", "CHANGE_PASSWORD");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }catch(DataAccessException e){

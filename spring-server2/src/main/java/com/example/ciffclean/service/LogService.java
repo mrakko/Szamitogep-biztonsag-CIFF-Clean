@@ -32,6 +32,7 @@ public class LogService {
         log.setDetails(details);
         log.setDate(new Date());
         logRepository.save(log);
+        System.out.println(log.getActivity() + log.getDetails());
         return log.getId();
     }
 }
