@@ -23,6 +23,8 @@ import com.example.ciffclean.service.AuthService;
 import com.example.ciffclean.service.JwtTokenUtil;
 import com.example.ciffclean.service.LogService;
 
+import io.jsonwebtoken.SignatureException;
+
 @CrossOrigin(origins ={"http://localhost:8080", "http://localhost:4200"})
 @RestController
 @RequestMapping("/auth")
