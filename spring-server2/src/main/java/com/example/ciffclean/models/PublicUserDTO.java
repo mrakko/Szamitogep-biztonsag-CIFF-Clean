@@ -14,7 +14,8 @@ public class PublicUserDTO   {
   public PublicUserDTO(PublicUserDTO other) {
     this.id = other.id;
     this.role = other.role;
-    this.profileImage = other.profileImage.clone();
+    if(other.profileImage != null)
+      this.profileImage = other.profileImage.clone();
   }
 
   public Integer getId() {
@@ -43,11 +44,14 @@ public class PublicUserDTO   {
   }
 
   public byte[] getProfileImage() {
-    return profileImage.clone();
+    if(profileImage != null)
+      return profileImage.clone();
+    return null;
   }
 
   public void setProfileImage(byte[] profileImage) {
-    this.profileImage = profileImage.clone();
+    if(profileImage != null)
+      this.profileImage = profileImage.clone();
   }
 
 }

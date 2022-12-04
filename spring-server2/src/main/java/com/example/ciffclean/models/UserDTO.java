@@ -2,7 +2,7 @@ package com.example.ciffclean.models;
 
 import com.example.ciffclean.domain.AppUser;
 
-public class UserDTO   {
+public class UserDTO {
   private Long id;
 
   private UserRole role;
@@ -16,11 +16,15 @@ public class UserDTO   {
   private byte[] profileImage;
 
   public byte[] getProfileImage() {
-    return profileImage.clone();
+    if (profileImage != null)
+      return profileImage.clone();
+    return null;
   }
-  
-  public UserDTO(){}
-  public UserDTO(AppUser user){
+
+  public UserDTO() {
+  }
+
+  public UserDTO(AppUser user) {
     this.id = user.getId();
     this.role = user.getRole();
     this.fullName = user.getFullName();
@@ -48,16 +52,19 @@ public class UserDTO   {
     return email;
   }
 
-  public void setImage(byte[] value){
-    this.profileImage = value.clone();
+  public void setImage(byte[] value) {
+    if(value != null)
+      this.profileImage = value.clone();
   }
 
   public void setFullName(String value) {
     this.fullName = value;
   }
+
   public void setEmail(String value) {
     this.email = value;
   }
+
   public void setAddress(String value) {
     this.address = value;
   }
