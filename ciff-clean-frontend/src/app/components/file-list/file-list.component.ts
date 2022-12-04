@@ -20,14 +20,6 @@ export enum OpenDialogReason {
   Modify
 }
 
-const TEST_MEDIA_DATA: MediaModel[] = [
-  {id: 0, fileName: 'Hydrogen', uploaderName: 'H', uploadDate: new Date(), numberOfComments: 2},
-  {id: 1, fileName: 'Helium', uploaderName: 'A', uploadDate: new Date(), numberOfComments: 4},
-  {id: 2, fileName: 'Nice', uploaderName: 'D', uploadDate: new Date(), numberOfComments: 12},
-  {id: 3, fileName: 'WOW', uploaderName: 'R', uploadDate: new Date(), numberOfComments: 0},
-  {id: 4, fileName: 'Funk', uploaderName: 'X', uploadDate: new Date(), numberOfComments: 0}
-];
-
 @Component({
   selector: 'ciff-clean-file-list',
   templateUrl: './file-list.component.html',
@@ -37,7 +29,7 @@ const TEST_MEDIA_DATA: MediaModel[] = [
 
 export class FileListComponent implements OnInit {
   public displayedColumns: string[];
-  public dataSource = TEST_MEDIA_DATA;
+  public dataSource: MediaModel[] = [];
   inputFieldText?: string;
 
   models: MediaModel[] = new Array<MediaModel>();
