@@ -64,7 +64,7 @@ public class AuthController {
             var res = new UserTokenDTO();
             logService.logActivity(currentUserId, "LOGIN REQUESTED: " + loginUserDTO.getEmail(), null);
             res.setToken(authService.login(loginUserDTO));
-            currentUserId = jwtTokenUtil.getUserIdFromToken(res.getToken()).get();
+            currentUserId = jwtTokenUtil.getUserIdFromToken(res.getToken());
             logService.logActivity(currentUserId, "SUCCESSFUL LOGIN " + loginUserDTO.getEmail(), null);
             return ResponseEntity.ok(res);
         } catch (NoSuchElementException e){

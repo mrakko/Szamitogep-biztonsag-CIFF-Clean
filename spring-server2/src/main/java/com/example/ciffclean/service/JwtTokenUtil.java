@@ -23,7 +23,7 @@ public class JwtTokenUtil implements Serializable {
     private final int tokenExpiryTime = 10 * 60 * 60 * 1000; //10 perc
 
     public Long getCurrentUserId(String authorization){
-        var id = getUserIdFromToken(authorization);
+        var id = getUserIdFromHeader(authorization);
         if(id == null){
             throw new NoSuchElementException(MediaService.USER_NOT_FOUND);
         }
@@ -41,7 +41,7 @@ public class JwtTokenUtil implements Serializable {
         return Optional.empty();
     }
 
-    public Optional<Long> getUserIdFromToken(String authHeader){
+    public Optional<Long> getUserIdFromHeader(String authHeader){
         var token = getTokenFromHeader(authHeader);
         if(!token.isEmpty()){
             Claims claims = getAllClaimsFromToken(token.get());
@@ -52,8 +52,17 @@ public class JwtTokenUtil implements Serializable {
         return Optional.empty();
     }
 
+    public Long getUserIdFromToken(String token){
+        Claims claims = getAllClaimsFromToken(token);
+        if(!isExpired(claims)) {
+            var res = doGetUserId(claims);
+            return res;
+        }
+        return -1L;
+    }
+
     public void checkIfUserIsAuthenticated(String authHeader){
-        var userId = getUserIdFromToken(authHeader);
+        var userId = getUserIdFromHeader(authHeader);
         if(userId.isEmpty()){
            throw new NoSuchElementException(MediaService.USER_NOT_FOUND); 
         }
