@@ -7,4 +7,8 @@ public class EditFileDTO   {
     return fileName;
   }
 
+  public void setFileName(String fileName) {
+      this.fileName = fileName;
+  }
+
 }

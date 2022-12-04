@@ -40,6 +40,15 @@ public class Comment {
         this.user = user;
     }
 
+    public Comment() {}
+
+    public Comment(Comment other) {
+        this.id = other.id;
+        this.gifId = other.gifId;
+        this.user = new AppUser(other.user);
+        this.text = other.text;
+    }
+
     public CommentDTO toCommentDTO(){
         CommentDTO dto = new CommentDTO();
         dto.setId(id.intValue());

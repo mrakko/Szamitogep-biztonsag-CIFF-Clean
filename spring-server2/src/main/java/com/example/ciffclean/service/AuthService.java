@@ -1,5 +1,6 @@
 package com.example.ciffclean.service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.NoSuchElementException;
 
@@ -69,7 +70,7 @@ public class AuthService {
 
    public String getHash(String password) throws Exception{
         MessageDigest md = MessageDigest.getInstance("SHA-512");
-        byte[] data = md.digest(password.getBytes());
+        byte[] data = md.digest(password.getBytes(StandardCharsets.UTF_8));
         StringBuilder sb = new StringBuilder();
         for(int i=0; i < data.length; i++){
             sb.append(Integer.toString((data[i] & 0xff) + 0x100, 16).substring(1));

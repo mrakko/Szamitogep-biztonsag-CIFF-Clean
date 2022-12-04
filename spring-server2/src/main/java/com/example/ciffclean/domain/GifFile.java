@@ -36,24 +36,24 @@ public class GifFile {
     private Date uploadDate;
 
     public Date getUploadDate() {
-        return uploadDate;
+        return (Date) uploadDate.clone();
     }
     public void setUploadDate(Date uploadDate) {
-        this.uploadDate = uploadDate;
+        this.uploadDate = (Date) uploadDate.clone();
     }
     public Long getId() { return this.id; }
     public String getName() { return this.name; }
-    public List<Comment> getComments() { return this.comments; }
-    public byte[] getContent() { return content; }
+    public List<Comment> getComments() { return new ArrayList<Comment>(this.comments); }
+    public byte[] getContent() { return content.clone(); }
     public AppUser getUser() { return user; }
-    public byte[] getCaff() { return caff; }
+    public byte[] getCaff() { return caff.clone(); }
 
     public void setId(Long id) { this.id = id; }
     public void setName(String name) { this.name = name; }
-    public void setComments(ArrayList<Comment> comments) { this.comments = comments; }
-    public void setContent(byte[] content) { this.content = content; }
+    public void setComments(List<Comment> comments) { this.comments = new ArrayList<Comment>(comments); }
+    public void setContent(byte[] content) { this.content = content.clone(); }
     public void setUser(AppUser user) { this.user = user; }
-    public void setCaff(byte[] caff) { this.caff = caff; }
+    public void setCaff(byte[] caff) { this.caff = caff.clone(); }
     public void addComment(Comment c){this.comments.add(c);}
 
     public MediaDTO toMediaDTO(){

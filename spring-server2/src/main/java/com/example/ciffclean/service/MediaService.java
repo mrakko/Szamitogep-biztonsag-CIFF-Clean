@@ -49,13 +49,16 @@ public class MediaService {
     
     public Long addCaff(byte[] content, String name, Long userId) throws SerialException, SQLException, InvalidPathException, NullPointerException{
         String uuid = UUID.randomUUID().toString();
-        Path caff_path = Paths.get(TMP_CAFF_FOLDER_PATH + "/" + uuid + ".caff");
-        Path gif_path = Paths.get(TMP_GIF_FOLDER_PATH + "/" + uuid + ".gif");
+        Path caff_folder_path = Paths.get(TMP_CAFF_FOLDER_PATH);
+        Path gif_folder_path = Paths.get(TMP_GIF_FOLDER_PATH);
+        Path caff_path = Paths.get(caff_folder_path.toString(), uuid + ".caff");
+        Path gif_path = Paths.get(gif_folder_path.toString(), uuid + ".gif");
+        
         
         try {
-            Files.createDirectories(caff_path.getParent());
+            Files.createDirectories(caff_folder_path);
             Files.createFile(caff_path);
-            Files.createDirectories(gif_path.getParent());
+            Files.createDirectories(gif_folder_path);
             Files.createFile(gif_path);
         }catch (IOException e) {
             System.out.println("An error occurred while creating tmp folders.");

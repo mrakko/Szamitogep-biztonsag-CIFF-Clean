@@ -24,11 +24,11 @@ public class CommentDTO   {
   }
 
   public PublicUserDTO getCommenter() {
-    return commenter;
+    return new PublicUserDTO(commenter);
   }
 
   public void setCommenter(PublicUserDTO commenter) {
-    this.commenter = commenter;
+    this.commenter = new PublicUserDTO(commenter);
   }
 
 }
