@@ -24,7 +24,7 @@ public class JwtTokenUtil implements Serializable {
 
     public Long getCurrentUserId(String authorization){
         var id = getUserIdFromHeader(authorization);
-        if(id == null){
+        if(id.isEmpty()){
             throw new NoSuchElementException(MediaService.USER_NOT_FOUND);
         }
         return id.get();
