@@ -20,6 +20,7 @@ public class LogService {
 
 
     public Long logError(Long userId, String cause, String function){
+        if(cause.length() > 200){cause = cause.substring(0, 200);}
         return log(userId, function, null, false, cause);
     }
 

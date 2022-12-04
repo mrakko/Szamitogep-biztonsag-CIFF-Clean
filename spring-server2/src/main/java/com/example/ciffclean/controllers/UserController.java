@@ -18,7 +18,7 @@ import com.example.ciffclean.service.JwtTokenUtil;
 import com.example.ciffclean.service.LogService;
 import com.example.ciffclean.service.UserService;
 
-@CrossOrigin
+@CrossOrigin(origins ={"http://localhost:8080", "http://localhost:4200"})
 @RestController
 @RequestMapping("/user")
 public class UserController {

@@ -28,7 +28,7 @@ import com.example.ciffclean.service.LogService;
 import com.example.ciffclean.service.MediaService;
 import com.example.ciffclean.service.UserService;
 
-@CrossOrigin
+@CrossOrigin(origins ={"http://localhost:8080", "http://localhost:4200"})
 @RestController
 @RequestMapping("/media")
 public class MediaController {
@@ -220,7 +220,7 @@ public class MediaController {
     }
 
     @PostMapping("/upload")
-    public ResponseEntity<Long> uploadFile(
+    public ResponseEntity<Void> uploadFile(
         @RequestHeader(value = "Authorization") String authorization,
         @RequestParam("file") MultipartFile file
     ) {
@@ -236,7 +236,7 @@ public class MediaController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
             logService.logActivity(currentUserId, "UPLOAD DONE", id);
-            return ResponseEntity.ok().body(id);
+            return ResponseEntity.ok().build();
         } catch (NoSuchElementException e) {
             logService.logError(currentUserId, "UNAUTHORIZED", "UPLOAD");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

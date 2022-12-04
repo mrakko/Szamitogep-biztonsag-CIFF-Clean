@@ -15,7 +15,7 @@ public class GifFile {
     @GeneratedValue
     private Long id;
 
-    @Column(unique = true)
+    @Column
     private String name;
 
     @OneToMany(cascade = CascadeType.MERGE, mappedBy="gifId", orphanRemoval = true)

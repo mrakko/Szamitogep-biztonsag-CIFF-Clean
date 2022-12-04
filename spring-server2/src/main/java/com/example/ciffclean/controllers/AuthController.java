@@ -20,7 +20,7 @@ import com.example.ciffclean.models.UserTokenDTO;
 import com.example.ciffclean.repositories.UserRepository;
 import com.example.ciffclean.service.JwtTokenUtil;
 
-@CrossOrigin
+@CrossOrigin(origins ={"http://localhost:8080", "http://localhost:4200"})
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
