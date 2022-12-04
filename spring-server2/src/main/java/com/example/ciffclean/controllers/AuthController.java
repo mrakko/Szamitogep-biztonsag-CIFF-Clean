@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -45,6 +46,9 @@ public class AuthController {
             }
             return ResponseEntity.ok(authService.register(createUserDTO));
 
+        }catch(DataAccessException dae){
+            dae.printStackTrace();
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -59,6 +63,9 @@ public class AuthController {
             if(userList.isEmpty()){ return ResponseEntity.status(HttpStatus.NO_CONTENT).build(); }
             if(userList.size() != 1){ return ResponseEntity.status(HttpStatus.CONFLICT).build(); }
             return ResponseEntity.ok(generateUserTokenDTO(userList.get(0)));
+        }catch(DataAccessException dae){
+            dae.printStackTrace();
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -85,6 +92,9 @@ public class AuthController {
                 }
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }                
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
+        }catch(DataAccessException dae){
+            dae.printStackTrace();
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }catch (Exception e) {
             e.printStackTrace();
