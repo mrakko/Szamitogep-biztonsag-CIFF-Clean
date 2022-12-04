@@ -16,6 +16,7 @@ public class PublicUserDTO   {
     this.role = other.role;
     if(other.profileImage != null)
       this.profileImage = other.profileImage.clone();
+    this.fullName = other.fullName;
   }
 
   public Integer getId() {
