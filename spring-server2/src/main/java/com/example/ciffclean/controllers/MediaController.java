@@ -76,9 +76,10 @@ public class MediaController {
        Long currentUserId = -1L;
         try {
             currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
-            logService.logActivity(currentUserId, "DELETE", id);
+            logService.logActivity(currentUserId, "DELETE STARTED", id);
             checkUserRole(currentUserId, UserRole.Admin);
             mediaService.deleteFile(id);
+            logService.logActivity(currentUserId, "DELETE DONE", id);
             return ResponseEntity.noContent().build();
         } catch (NoSuchElementException e) {
             if(e.getMessage().equals(MediaService.FILE_NOT_FOUND)){
@@ -202,6 +203,7 @@ public class MediaController {
             currentUserId = jwtTokenUtil.getCurrentUserId(authorization);
             jwtTokenUtil.checkIfUserIsAuthenticated(authorization);
             logService.logActivity(currentUserId, "MODIFYFILE START", file_id);
+            checkUserRole(currentUserId, UserRole.Admin);
             GifFile gifFile = mediaService.editFileName(file_id, body.getFileName());
             logService.logActivity(currentUserId, "MODIFYFILE OK", file_id);
             return ResponseEntity.ok().body(gifFile.toMediaDTO());
@@ -212,7 +214,10 @@ public class MediaController {
             }
             logService.logError(currentUserId, "UNAUTHORIZED", "MODIFYFILE");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
+            logService.logError(currentUserId, currentUserId.toString() + " IS NOT ADMIN", "MODIFYFILE");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }  catch (Exception e) {
             e.printStackTrace();
             logService.logError(currentUserId, e.getMessage(), "MODIFYFILE");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

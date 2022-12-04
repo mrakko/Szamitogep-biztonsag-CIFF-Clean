@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.example.ciffclean.domain.AppUser;
 import com.example.ciffclean.models.CreateUserDTO;
 import com.example.ciffclean.models.LoginUserDTO;
+import com.example.ciffclean.models.UserRole;
 import com.example.ciffclean.models.UserTokenDTO;
 import com.example.ciffclean.repositories.UserRepository;
 
@@ -30,6 +31,7 @@ public class AuthService {
         appUser.setEmail(createUserDTO.getEmail());        
         appUser.setPassword(getHash(createUserDTO.getPassword()));
         appUser.setFullName(createUserDTO.getFullName());
+        appUser.setRole(UserRole.Regular);
         userRepository.save(appUser);
         String token = jwtTokenUtil.generateToken(appUser.getId(), appUser.getFullName());
         UserTokenDTO userTokenDTO = new UserTokenDTO();
