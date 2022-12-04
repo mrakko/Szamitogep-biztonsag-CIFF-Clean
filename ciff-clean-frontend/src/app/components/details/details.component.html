@@ -1,0 +1,34 @@
+<ng-template [ngIf]="file != undefined" [ngIfElse]="notFound">
+  <div class="flex-center details-section">
+    <h1>{{file.fileName}}</h1>
+    <img [src]="media" class="gif"
+         alt="gif"  *ngIf="media != undefined"/>
+    <div>Uploader: {{file.uploader.fullName}}</div>
+    <div>Uploaded at: {{file.uploadDate | date:'y.MM.dd. HH:mm'}}</div>
+
+    <button mat-button color="primary" (click)="showCommentArea = true" *ngIf="!showCommentArea">
+      Add comment
+      <mat-icon class="mat-18">add</mat-icon>
+    </button>
+    <div class="write-comment-section" *ngIf="showCommentArea">
+      <textarea class="write-comment" [(ngModel)]="commentText"></textarea>
+      <button mat-fab color="primary" (click)="comment()">
+        <mat-icon class="mat-18">question_answer</mat-icon>
+      </button>
+    </div>
+
+
+    <div class="comment-box">
+      <ng-container *ngFor="let comment of file.comments">
+        <div class="comment">
+          <div class="commenter">{{comment.commenter.fullName}}</div>
+          <div class="comment-text">{{comment.text}}</div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #notFound>
+  <h1 class="flex-center">File Not found</h1>
+</ng-template>

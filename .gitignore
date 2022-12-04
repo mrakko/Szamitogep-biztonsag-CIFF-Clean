@@ -1,8 +1,45 @@
 .vscode
-
 parser/obj
 parser/data/*.gif
 parser/*.d
 parser/*.exe
+
+# Compiled output
+/ciff-clean-frontend/dist
+/ciff-clean-frontend/tmp
+/ciff-clean-frontend/out-tsc
+/ciff-clean-frontend/bazel-out
+
+# Node
+/ciff-clean-frontend/node_modules
+/ciff-clean-frontend/npm-debug.log
+/ciff-clean-frontend/yarn-error.log
+
+# IDEs and editors
+/ciff-clean-frontend/.idea/
+/ciff-clean-frontend/.project
+/ciff-clean-frontend/.classpath
+/ciff-clean-frontend/.c9/
+/ciff-clean-frontend/*.launch
+/ciff-clean-frontend/.settings/
+/ciff-clean-frontend/*.sublime-workspace
+
+# Visual Studio Code
+/ciff-clean-frontend/.vscode/*
+/ciff-clean-frontend/.history/*
+
+# Miscellaneous
+/ciff-clean-frontend/.angular/cache
+/ciff-clean-frontend/.sass-cache/
+/ciff-clean-frontend/connect.lock
+/ciff-clean-frontend/coverage
+/ciff-clean-frontend/libpeerconnection.log
+/ciff-clean-frontend/testem.log
+/ciff-clean-frontend/typings
+
+# System files
+/ciff-clean-frontend/.DS_Store
+/ciff-clean-frontend/Thumbs.db
 ciff-clean-frontend/.angular/
 ciff-clean-frontend/node_modules
+

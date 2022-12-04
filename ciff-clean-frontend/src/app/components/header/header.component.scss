@@ -1,0 +1,13 @@
+mat-toolbar {
+  position: fixed;
+  z-index: 2;
+
+  .header-logo{
+    cursor: pointer;
+    padding-left: 8px;
+  }
+
+  .header-spacer {
+    flex: 1 auto;
+  }
+}

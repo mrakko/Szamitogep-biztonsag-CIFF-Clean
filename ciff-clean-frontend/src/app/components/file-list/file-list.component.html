@@ -1,0 +1,60 @@
+<div class="container">
+    <mat-form-field>
+        <mat-label>Search</mat-label>
+        <div class="cancel-button">
+          <input matInput (keyup.enter)="applyFilter($event)" [(ngModel)]="inputFieldText" #input>
+          <button mat-button *ngIf="inputFieldText" (click)="clearSearch()">clear</button>
+        </div>
+    </mat-form-field>
+    <button mat-raised-button color="primary" (click)="onUploadClick()" class="add-button">
+        Upload
+    </button>
+</div>
+<div class="table-div">
+<table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.fileName}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="uploaderName">
+      <mat-header-cell *matHeaderCellDef> Uploader </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.uploaderName}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="uploadDate">
+      <mat-header-cell *matHeaderCellDef> Upload Date </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{ element.uploadDate | date: 'dd/MM/yyyy' }} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="numberOfComments">
+      <mat-header-cell *matHeaderCellDef> Comments </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.numberOfComments}} </mat-cell>
+    </ng-container>
+
+    <ng-template [ngIf]="isAdmin">
+      <ng-container matColumnDef="modify">
+        <mat-header-cell *matHeaderCellDef> Modify </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <button mat-icon-button color="primary" (click)="onModifyClick($event, element)">
+              <mat-icon class="mat-18">edit</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+  
+      <ng-container matColumnDef="delete">
+        <mat-header-cell *matHeaderCellDef> Delete </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <button mat-icon-button color="warn" (click)="onDeleteClick($event, element)">
+              <mat-icon class="mat-18">delete</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+    </ng-template>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;" 
+    (click)="onRowClicked(row)"
+    matRipple></mat-row>
+</table>
+</div>

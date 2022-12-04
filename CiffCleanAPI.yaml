@@ -291,14 +291,11 @@ components:
           format: binary
     UserTokenDTO:
       required:
-        - userId
         - token
       type: object
       properties:
         token:
           type: string
-        userId:
-          type: integer
     ChangeUserPasswordDTO:
       type: object
       properties:
