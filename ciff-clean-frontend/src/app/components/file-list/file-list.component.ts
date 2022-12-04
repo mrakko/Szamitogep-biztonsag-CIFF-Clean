@@ -92,7 +92,7 @@ export class FileListComponent implements OnInit{
       if (result.event == DialogBoxAction.Cancel) {
         return;
       } else {
-        this.addRowData(result.data);
+        this.getMediaItems();
       }
     });
   }

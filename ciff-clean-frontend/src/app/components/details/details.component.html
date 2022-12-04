@@ -1,8 +1,8 @@
 <ng-template [ngIf]="file != undefined" [ngIfElse]="notFound">
   <div class="flex-center details-section">
-    <!--TODO file-->
     <h1>{{file.fileName}}</h1>
-    <img src="http://i.stack.imgur.com/SBv4T.gif" alt="this slowpoke moves"  width="250" />
+    <img [src]="media" class="gif"
+         alt="gif"  *ngIf="media != undefined"/>
     <div>Uploader: {{file.uploader.fullName}}</div>
     <div>Uploaded at: {{file.uploadDate | date:'y.MM.dd. HH:mm'}}</div>
 

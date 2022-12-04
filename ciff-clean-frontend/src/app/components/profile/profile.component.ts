@@ -96,7 +96,6 @@ export class ProfileComponent implements OnInit {
       newPassword: this.passwordControl.value
     };
 
-    //TODO uncomment
     this.authService.changePassword(pass).subscribe((userToken) => {
         this.snackBar.open('Password changed successfully', undefined, {
           duration: 2000,

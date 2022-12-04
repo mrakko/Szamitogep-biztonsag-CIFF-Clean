@@ -200,7 +200,8 @@ export class MediaService {
         withCredentials: this.configuration.withCredentials,
         headers: headers,
         observe: observe,
-        reportProgress: reportProgress
+        reportProgress: reportProgress,
+        'responseType'  : 'arraybuffer' as 'json'
       }
     );
   }

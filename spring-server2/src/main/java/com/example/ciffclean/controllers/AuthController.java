@@ -16,6 +16,7 @@ import com.example.ciffclean.domain.AppUser;
 import com.example.ciffclean.models.ChangeUserPasswordDTO;
 import com.example.ciffclean.models.CreateUserDTO;
 import com.example.ciffclean.models.LoginUserDTO;
+import com.example.ciffclean.models.UserRole;
 import com.example.ciffclean.models.UserTokenDTO;
 import com.example.ciffclean.repositories.UserRepository;
 import com.example.ciffclean.service.JwtTokenUtil;
@@ -40,6 +41,7 @@ public class AuthController {
             appUser.setEmail(createUserDTO.getEmail());
             appUser.setPassword(createUserDTO.getPassword());   //TODO: Plaintext helyett cizelláltabban...
             appUser.setFullName(createUserDTO.getFullName());
+            appUser.setRole(UserRole.Regular);
             userRepository.save(appUser);
             return ResponseEntity.ok(generateUserTokenDTO(appUser));
 
