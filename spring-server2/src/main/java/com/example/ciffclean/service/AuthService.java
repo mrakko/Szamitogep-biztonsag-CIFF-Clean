@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import com.example.ciffclean.domain.AppUser;
 import com.example.ciffclean.models.CreateUserDTO;
 import com.example.ciffclean.models.LoginUserDTO;
+import com.example.ciffclean.models.UserTokenDTO;
 import com.example.ciffclean.repositories.UserRepository;
 
 @Component
@@ -19,14 +20,18 @@ public class AuthService {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
     
-    public String register(CreateUserDTO createUserDTO){
-         AppUser appUser = new AppUser();
-         appUser.setAddress(createUserDTO.getAddress());
-         appUser.setEmail(createUserDTO.getEmail());
-         appUser.setPassword(createUserDTO.getPassword());   //TODO: Plaintext helyett cizelláltabban...
-         appUser.setFullName(createUserDTO.getFullName());
-         userRepository.save(appUser);
-         return jwtTokenUtil.generateToken(appUser.getId(), appUser.getFullName());
+    public UserTokenDTO register(CreateUserDTO createUserDTO){
+        AppUser appUser = new AppUser();
+        appUser.setAddress(createUserDTO.getAddress());
+        appUser.setEmail(createUserDTO.getEmail());
+        appUser.setPassword(createUserDTO.getPassword());   //TODO: Plaintext helyett cizelláltabban...
+        appUser.setFullName(createUserDTO.getFullName());
+        userRepository.save(appUser);
+        String token = jwtTokenUtil.generateToken(appUser.getId(), appUser.getFullName());
+        UserTokenDTO userTokenDTO = new UserTokenDTO();
+        userTokenDTO.setUserId(appUser.getId());
+        userTokenDTO.setToken(token); 
+        return userTokenDTO;
     }
 
     public String login(LoginUserDTO loginUserDTO){

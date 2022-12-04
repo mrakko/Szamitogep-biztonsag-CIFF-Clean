@@ -18,6 +18,7 @@ import com.example.ciffclean.models.CreateUserDTO;
 import com.example.ciffclean.models.LoginUserDTO;
 import com.example.ciffclean.models.UserTokenDTO;
 import com.example.ciffclean.repositories.UserRepository;
+import com.example.ciffclean.service.AuthService;
 import com.example.ciffclean.service.JwtTokenUtil;
 
 @CrossOrigin
@@ -31,17 +32,14 @@ public class AuthController {
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
 
+    @Autowired
+    private AuthService authService;
+
     @PostMapping("register")
     public ResponseEntity<UserTokenDTO> registerUser(@RequestBody CreateUserDTO createUserDTO){
         try{
             //TODO: Input validation
-            AppUser appUser = new AppUser();
-            appUser.setAddress(createUserDTO.getAddress());
-            appUser.setEmail(createUserDTO.getEmail());
-            appUser.setPassword(createUserDTO.getPassword());   //TODO: Plaintext helyett cizelláltabban...
-            appUser.setFullName(createUserDTO.getFullName());
-            userRepository.save(appUser);
-            return ResponseEntity.ok(generateUserTokenDTO(appUser));
+            return ResponseEntity.ok(authService.register(createUserDTO));
 
         }catch (Exception e) {
             e.printStackTrace();
