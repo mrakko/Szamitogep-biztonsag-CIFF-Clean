@@ -24,14 +24,14 @@ public class AuthServiceTest {
 	private UserRepository userRepository;
 
     @Test
-    public void registerTest(){
+    public void registerTest() throws Exception{
         var dto = createUser();
         authService.register(dto);
         assertEquals(1, userRepository.count());
     }
 
     @Test
-    public void loginTest(){
+    public void loginTest() throws Exception{
         var dto = createUser();
         authService.register(dto);
         
@@ -42,25 +42,26 @@ public class AuthServiceTest {
     }
 
     @Test
-    public void changePasswordTest(){
+    public void changePasswordTest() throws Exception{
         var dto = createUser();
         authService.register(dto);
 
         authService.changePassword(1L, dto.getPassword(), "MyNewPass123");
         var user = userRepository.findById(1L).get();
-        assertEquals(user.getPassword(), "MyNewPass123");
+        assertEquals(user.getPassword(), authService.getHash("MyNewPass123"));
     }
 
     private CreateUserDTO createUser(){
         var dto = new CreateUserDTO();
         dto.setEmail("myemail@email.com");
-        dto.setPassword("MyPass123");
+        dto.setPassword("MyOldPassword1234");
         return dto;
     }
 
     private LoginUserDTO createLoginUser(){
         var dto = new LoginUserDTO();
         dto.setEmail("myemail@email.com");
+        dto.setPassword("MyOldPassword1234");
         return dto;
     }
 }
