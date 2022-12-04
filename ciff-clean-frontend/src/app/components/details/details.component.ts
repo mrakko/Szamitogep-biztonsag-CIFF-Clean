@@ -3,6 +3,7 @@ import {ActivatedRoute} from "@angular/router";
 import {CreateCommentDTO, MediaDTO, MediaService, UserRole} from "../../services/networking";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {BehaviorSubject} from "rxjs";
+import {HttpErrorResponse} from "@angular/common/http";
 
 @Component({
   selector: 'ciff-clean-details',
@@ -30,10 +31,10 @@ export class DetailsComponent implements OnInit {
       let file = new Blob([data], {type: 'image/gif'});
       let reader = new FileReader();
       reader.readAsDataURL(file);
-      let result = new BehaviorSubject< string | ArrayBuffer | null>('');
+      let result = new BehaviorSubject<string | ArrayBuffer | null>('');
       result.subscribe(src => this.media = src);
-       reader.onloadend = function() {
-         result.next(reader.result);
+      reader.onloadend = function () {
+        result.next(reader.result);
       }
     });
   }
@@ -52,6 +53,12 @@ export class DetailsComponent implements OnInit {
     this.mediaService.commentFile(createComment).subscribe(() => {
       this.commentText = "";
       this.initDetails(this.file!.fileId);
+    }, (error) => {
+      if (error instanceof HttpErrorResponse) {
+        this.snackBar.open('Comment was unsuccessful', undefined, {
+          duration: 2000,
+        });
+      }
     })
   }
 }

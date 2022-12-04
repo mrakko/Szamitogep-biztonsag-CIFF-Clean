@@ -51,6 +51,9 @@ export class LoginComponent {
         this.router.navigate(["file-list"]);
       })
     }, (error) => {
+      if (error instanceof HttpErrorResponse && error.status == 500) {
+        this.errorMessage = "Server is unreachable";
+      }
       if (error instanceof HttpErrorResponse) {
         this.errorMessage = "Incorrect email or password";
       }

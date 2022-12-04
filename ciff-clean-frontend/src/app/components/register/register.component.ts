@@ -64,8 +64,10 @@ export class RegisterComponent {
           this.router.navigate(["file-list"]);
         })
       }, (error) => {
-        if (error instanceof HttpErrorResponse) {
-          this.errorMessage = "Incorrect email or password";
+        if (error instanceof HttpErrorResponse && error.status === 400) {
+          this.errorMessage = "User already exist";
+        } else if (error instanceof HttpErrorResponse && error.status === 500) {
+          this.errorMessage = "Server is unreachable";
         }
       }
     );

@@ -16,6 +16,9 @@
       <input matInput [formControl]="addressControl">
       <mat-error *ngIf="addressControl.invalid">{{getErrorMessage(addressControl)}}</mat-error>
     </mat-form-field>
+    <div *ngIf="errorMessageData != ''"
+         class="error-message">{{errorMessageData}}
+    </div>
     <button mat-raised-button color="primary" type="submit" [disabled]="!profileForm.valid">Change</button>
   </form>
 
@@ -51,6 +54,9 @@
     </mat-form-field>
     <div *ngIf="authForm.hasError('noMatch') && passwordControl.touched && confirmControl.touched"
          class="error-message">Given passwords don't match
+    </div>
+    <div *ngIf="errorMessage != ''"
+         class="error-message">{{errorMessage}}
     </div>
     <button mat-raised-button color="primary" type="submit" [disabled]="!authForm.valid">Change Password</button>
   </form>

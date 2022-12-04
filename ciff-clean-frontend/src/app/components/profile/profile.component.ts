@@ -34,6 +34,8 @@ export class ProfileComponent implements OnInit {
   hideOld = true;
   hideNew = true;
   hideConfirm = true;
+  errorMessage = "";
+  errorMessageData = "";
 
   constructor(private authService: AuthService, private snackBar: MatSnackBar, private storageService: StorageService,
               private userService: UserService) {
@@ -82,11 +84,16 @@ export class ProfileComponent implements OnInit {
     }
 
     this.userService.editUser(user).subscribe((newUser) => {
-      this.storageService.saveUser(newUser);
+      this.errorMessageData = "";
+        this.storageService.saveUser(newUser);
         this.snackBar.open('User edited successfully', undefined, {
           duration: 2000,
         });
-      },
+      },(error) => {
+        if (error instanceof HttpErrorResponse) {
+          this.errorMessageData = "Unknown error";
+        }
+      }
     );
   }
 
@@ -97,10 +104,15 @@ export class ProfileComponent implements OnInit {
     };
 
     this.authService.changePassword(pass).subscribe((userToken) => {
+      this.errorMessage = "";
         this.snackBar.open('Password changed successfully', undefined, {
           duration: 2000,
         });
-      },
+      }, (error) => {
+        if (error instanceof HttpErrorResponse) {
+          this.errorMessage = "Incorrect old password";
+        }
+      }
     );
   }
 }
