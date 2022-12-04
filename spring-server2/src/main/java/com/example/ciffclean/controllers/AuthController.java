@@ -41,7 +41,7 @@ public class AuthController {
     public ResponseEntity<UserTokenDTO> registerUser(@RequestBody CreateUserDTO createUserDTO){
         try{
             //TODO: Input validation
-            if(!EmailValidator.getInstance().isValid(createUserDTO.getEmail())){
+            if(!EmailValidator.getInstance().isValid(createUserDTO.getEmail()) || !isValidPassword(createUserDTO.getPassword())){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
             return ResponseEntity.ok(authService.register(createUserDTO));
@@ -84,6 +84,9 @@ public class AuthController {
                     Optional<AppUser> appUser = userRepository.findById(userId);
                     if(!appUser.isPresent()){   return ResponseEntity.status(HttpStatus.NO_CONTENT).build();}
                     if(appUser.get().getPassword().equals(changeUserPasswordDTO.getOldPassword())){
+                        if(!isValidPassword(changeUserPasswordDTO.getNewPassword())){
+                            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); 
+                        }
                         AppUser changedUser = appUser.get();
                         changedUser.setPassword(changeUserPasswordDTO.getNewPassword());
                         userRepository.save(changedUser);
@@ -108,6 +111,24 @@ public class AuthController {
         userTokenDTO.setUserId(appUser.getId());
         userTokenDTO.setToken(token); 
         return userTokenDTO;
+    }
+
+    public boolean isValidPassword(String password)
+    {
+            boolean isValid = true;
+
+            if (password.length() < 12){isValid = false;}
+
+            String upperCaseChars = "(.*[A-Z].*)";
+            if (!password.matches(upperCaseChars )){isValid = false;}
+
+            String lowerCaseChars = "(.*[a-z].*)";
+            if (!password.matches(lowerCaseChars )){isValid = false;}
+
+            String numbers = "(.*[0-9].*)";
+            if (!password.matches(numbers )){isValid = false;}
+
+            return isValid;
     }
     
 }
