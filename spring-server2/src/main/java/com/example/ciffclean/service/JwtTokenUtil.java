@@ -52,11 +52,9 @@ public class JwtTokenUtil implements Serializable {
         if(!token.isEmpty()){
             Claims claims = getAllClaimsFromToken(token.get());
             if(isExpired(claims)) {return Optional.empty();}
-            //*
             if(!userRepository.findById(doGetUserId(claims)).isPresent()){
                 return Optional.empty();
             }
-            //*/
 
             var res = doGetUserId(claims);
             return Optional.of(res);

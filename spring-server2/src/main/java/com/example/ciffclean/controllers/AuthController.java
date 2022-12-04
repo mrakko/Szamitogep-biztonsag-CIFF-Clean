@@ -42,7 +42,7 @@ public class AuthController {
     public ResponseEntity<UserTokenDTO> registerUser(@RequestBody CreateUserDTO createUserDTO){
         try{
             logService.logActivity(null, "REGISTER REQUESTED: " + createUserDTO.getEmail(), null);
-            if(/*!EmailValidator.getInstance().isValid(createUserDTO.getEmail()) ||*/ !authService.isValidPassword(createUserDTO.getPassword())){
+            if(!EmailValidator.getInstance().isValid(createUserDTO.getEmail()) || !authService.isValidPassword(createUserDTO.getPassword())){
                 logService.logError(null, "INVALID EMAIL OR PASSWORD", "REGISTER");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
